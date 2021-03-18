@@ -1,0 +1,21 @@
+{
+  "name": "react-like",
+  "version": "1.0.0",
+  "description": "react-like library",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "udbbbn",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/preset-react": "^7.12.10",
+    "@babel/preset-typescript": "^7.12.10",
+    "babel-core": "^7.0.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "parcel-bundler": "1.12.3",
+    "typescript": "3.7.2"
+  },
+  "dependencies": {}
+}
