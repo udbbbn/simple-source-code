@@ -1,17 +1,36 @@
 import { Vnode } from '../types'
+import { createComponent, executeRenderCallBack, setComponentProps } from './component'
 
 export const ReactDom = {
     render: (vnode, container: HTMLElement) => {
         container.innerHTML = ''
-        return render(vnode, container)
+        _render(vnode, container)
     }
 }
 
-function render(vnode: Vnode | string, container: HTMLElement) {
+const _render = function (vnode, container) {
+    container.appendChild(render(vnode))
+    // 执行清空队列
+    executeRenderCallBack()
+}
+
+export function render(vnode: Vnode | string) {
+    if (vnode === undefined || vnode === null || typeof vnode === 'boolean') vnode = ''
+
+    if (typeof vnode === 'number') vnode = String(vnode)
+
     // 文字类型 创建返回文字节点
     if (typeof vnode === 'string') {
         const textNode = document.createTextNode(vnode)
-        return container.appendChild(textNode)
+        return textNode
+    }
+
+    if (typeof vnode.tag === 'function') {
+        const component = createComponent(vnode.tag, vnode.attrs)
+
+        setComponentProps(component, vnode.attrs)
+
+        return component.base
     }
 
     const dom = document.createElement(vnode.tag)
@@ -19,13 +38,13 @@ function render(vnode: Vnode | string, container: HTMLElement) {
     if (vnode.attrs) {
         // 遍历设置属性
         Object.keys(vnode.attrs).forEach(key => {
-            setAttribute(dom, key, vnode.attrs[key])
+            setAttribute(dom, key, (vnode as Vnode).attrs[key])
         })
     }
 
-    vnode.children.forEach(child => render(child, dom))
+    vnode.children.forEach(child => _render(child, dom))
 
-    return container.appendChild(dom)
+    return dom
 }
 
 function setAttribute(dom: HTMLElement, key, val: string) {
