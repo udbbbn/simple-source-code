@@ -1,6 +1,6 @@
-import { h } from './h'
+import { createElement, Fragment } from './h'
 import { ReactDom } from './dom'
 
-export { h, ReactDom }
+export { createElement, Fragment, ReactDom }
 
-export default { h }
+export default { createElement }

@@ -1,6 +1,6 @@
 import { Vnode } from '../types'
 
-function h(tag, attrs, ...children): Vnode {
+function createElement(tag, attrs, ...children): Vnode {
     return {
         tag,
         attrs,
@@ -8,4 +8,6 @@ function h(tag, attrs, ...children): Vnode {
     }
 }
 
-export { h }
+export const Fragment: any = document.createDocumentFragment()
+
+export { createElement }

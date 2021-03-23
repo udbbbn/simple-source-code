@@ -33,7 +33,14 @@ export function render(vnode: Vnode | string) {
         return component.base
     }
 
-    const dom = document.createElement(vnode.tag)
+    let dom
+
+    // fragment
+    if (typeof vnode.tag === 'object' && (vnode.tag as DocumentFragment).nodeType === 11) {
+        dom = vnode.tag
+    } else {
+        dom = document.createElement(vnode.tag)
+    }
 
     if (vnode.attrs) {
         // 遍历设置属性
