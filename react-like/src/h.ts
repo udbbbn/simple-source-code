@@ -1,6 +1,13 @@
 import { Vnode } from '../types'
 
-function createElement(tag, attrs, ...children): Vnode {
+function createElement(tag, attrs, children): Vnode {
+    if (arguments.length > 3) {
+        children = [children]
+        for (let i = 3; i < arguments.length; i++) {
+            children.push(arguments[i])
+        }
+    }
+
     return {
         tag,
         attrs,
@@ -8,6 +15,8 @@ function createElement(tag, attrs, ...children): Vnode {
     }
 }
 
-export const Fragment: any = document.createDocumentFragment()
+export function Fragment(props) {
+    return props.children
+}
 
 export { createElement }

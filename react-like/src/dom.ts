@@ -26,21 +26,14 @@ export function render(vnode: Vnode | string) {
     }
 
     if (typeof vnode.tag === 'function') {
-        const component = createComponent(vnode.tag, vnode.attrs)
+        const component = createComponent(vnode.tag, { ...vnode.attrs, children: vnode.children })
 
         setComponentProps(component, vnode.attrs)
 
         return component.base
     }
 
-    let dom
-
-    // fragment
-    if (typeof vnode.tag === 'object' && (vnode.tag as DocumentFragment).nodeType === 11) {
-        dom = vnode.tag
-    } else {
-        dom = document.createElement(vnode.tag)
-    }
+    const dom = document.createElement(vnode.tag)
 
     if (vnode.attrs) {
         // 遍历设置属性
@@ -49,7 +42,11 @@ export function render(vnode: Vnode | string) {
         })
     }
 
-    vnode.children.forEach(child => _render(child, dom))
+    if (typeof vnode.children === 'string') {
+        _render(vnode.children, dom)
+    } else {
+        vnode.children.forEach(child => _render(child, dom))
+    }
 
     return dom
 }

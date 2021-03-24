@@ -25,7 +25,10 @@ class App extends Component {
         return (
             <div id="test">
                 Hello, react-like {this.state.count}
-                <React.Fragment>---33333</React.Fragment>
+                <React.Fragment>
+                    <div>hello</div>
+                    fragment
+                </React.Fragment>
                 <div
                     onClick={() =>
                         this.setState({

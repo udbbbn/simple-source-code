@@ -1,4 +1,5 @@
 import { render } from './dom'
+import { toString } from './util'
 
 const _renderCallBacks = []
 
@@ -57,7 +58,14 @@ export function renderComponent(component) {
         component.componentWillUpdate()
     }
 
-    base = render(renderer)
+    // 如果是 fragment renderer 结果会为多个
+    if (toString(renderer) === '[object Array]') {
+        const fragment = document.createDocumentFragment()
+        renderer.forEach(el => fragment.appendChild(render(el)))
+        base = fragment
+    } else {
+        base = render(renderer)
+    }
 
     // 将注册的事件扔队列中 render 后调用
     if (component.base) {
