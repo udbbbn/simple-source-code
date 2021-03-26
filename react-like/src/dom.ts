@@ -1,5 +1,6 @@
 import { Vnode } from '../types'
 import { createComponent, executeRenderCallBack, setComponentProps } from './component'
+import { toString } from './util'
 
 export const ReactDom = {
     render: (vnode, container: HTMLElement) => {
@@ -10,7 +11,7 @@ export const ReactDom = {
 
 const _render = function (vnode, container) {
     container.appendChild(render(vnode))
-    // 执行清空队列
+    // 执行清空队列 -- 存在bug 目前无法判断回调中的函数是否已经render
     executeRenderCallBack()
 }
 
@@ -42,11 +43,13 @@ export function render(vnode: Vnode | string) {
         })
     }
 
-    if (typeof vnode.children === 'string') {
-        _render(vnode.children, dom)
-    } else {
-        vnode.children.forEach(child => _render(child, dom))
+    // fragment 跟 context
+    // vnode.children 都可能为非数组
+    if (toString(vnode.children) !== '[object Array]') {
+        vnode.children = [vnode.children as any]
     }
+
+    vnode.children.forEach(child => _render(child, dom))
 
     return dom
 }

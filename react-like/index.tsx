@@ -1,8 +1,11 @@
 import { ReactDom } from './src'
 import * as React from './src'
 import Component from './src/component'
+import Child from './demo/child'
 
 const Welcome = <h1>Hello, react-like</h1>
+
+export const MyContext = React.createContext({ a: 'test' })
 
 class App extends Component {
     constructor(props) {
@@ -38,6 +41,9 @@ class App extends Component {
                 >
                     random Count
                 </div>
+                <MyContext.Provider value={{ a: this.state.count }}>
+                    <Child></Child>
+                </MyContext.Provider>
             </div>
         )
     }

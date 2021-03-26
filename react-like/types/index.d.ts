@@ -7,7 +7,7 @@ declare global {
 export type Vnode = {
     tag: string | Function
     attrs: Record<string, any>
-    children: Vnode[] | string
+    children: Vnode[]
 }
 
 export {}
