@@ -1,22 +1,26 @@
 import { render } from './dom'
 import { toString } from './util'
 
+// Map<symbol, Function)>[]
 const _renderCallBacks = []
 
 // render 后的回调
-export const executeRenderCallBack = () => {
-    while (_renderCallBacks.length) {
-        const func = _renderCallBacks.shift()
-        func()
+export const executeRenderCallBack = componentId => {
+    const callBacks = _renderCallBacks.map(el => el.get(componentId)).filter(Boolean)
+    while (callBacks.length) {
+        const callBack = callBacks.shift()
+        callBack()
     }
 }
 
 class Component {
+    __component_id__: symbol
     // 这里应该提供范型 但是先 any
     state: Record<string, any>
     props: Record<string, any>
 
     constructor(props = {}) {
+        this.__component_id__ = Symbol()
         this.state = {}
         this.props = props
     }
@@ -69,9 +73,9 @@ export function renderComponent(component) {
 
     // 将注册的事件扔队列中 render 后调用
     if (component.base) {
-        if (component.componentDidUpdate) _renderCallBacks.push(component.componentDidUpdate.bind(component))
+        if (component.componentDidUpdate) _renderCallBacks.push(new Map([[component.__component_id__, component.componentDidUpdate.bind(component)]]))
     } else if (component.componentDidMount) {
-        _renderCallBacks.push(component.componentDidMount.bind(component))
+        _renderCallBacks.push(new Map([[component.__component_id__, component.componentDidMount.bind(component)]]))
     }
 
     if (component.base && component.base.parentNode) {

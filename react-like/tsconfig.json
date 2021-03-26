@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "esModuleInterop": true,
+        "downlevelIteration":true,
         "jsx": "preserve",
         "module": "CommonJS",
         "lib": ["ES2017", "DOM"],

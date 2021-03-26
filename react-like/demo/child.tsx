@@ -7,7 +7,7 @@ export default function Child() {
             <MyContext.Consumer>
                 {val => {
                     console.log('context', val)
-                    return <div> context: {val}</div>
+                    return <div> context: {val.a}</div>
                 }}
             </MyContext.Consumer>
         </div>

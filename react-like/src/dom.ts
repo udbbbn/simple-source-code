@@ -10,9 +10,10 @@ export const ReactDom = {
 }
 
 const _render = function (vnode, container) {
-    container.appendChild(render(vnode))
-    // 执行清空队列 -- 存在bug 目前无法判断回调中的函数是否已经render
-    executeRenderCallBack()
+    const renderDom = render(vnode)
+    container.appendChild(renderDom)
+    // 执行清空队列
+    executeRenderCallBack(renderDom?._component?.__component_id__)
 }
 
 export function render(vnode: Vnode | string) {
