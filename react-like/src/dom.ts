@@ -47,7 +47,7 @@ export function render(vnode: Vnode | string) {
     // fragment 跟 context
     // vnode.children 都可能为非数组
     if (toString(vnode.children) !== '[object Array]') {
-        vnode.children = [vnode.children as any]
+        vnode.children = [(vnode.children as unknown) as Vnode]
     }
 
     vnode.children.forEach(child => _render(child, dom))

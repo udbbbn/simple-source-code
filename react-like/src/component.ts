@@ -1,3 +1,4 @@
+import { Vnode } from './../types/index.d'
 import { render } from './dom'
 import { toString } from './util'
 
@@ -13,16 +14,16 @@ export const executeRenderCallBack = componentId => {
     }
 }
 
-class Component {
+class Component<P = {}, S = {}> implements React.Component<P, S> {
     __component_id__: symbol
     // 这里应该提供范型 但是先 any
-    state: Record<string, any>
-    props: Record<string, any>
+    state: S
+    props: P
 
     constructor(props = {}) {
         this.__component_id__ = Symbol()
-        this.state = {}
-        this.props = props
+        this.state = {} as S
+        this.props = props as P
     }
 
     setState(nextState) {
