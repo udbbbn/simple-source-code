@@ -1,5 +1,6 @@
-import { Vnode } from './../types/index.d'
-import { render } from './dom'
+import { ComponentLifeCycle, Vnode } from './../types/index.d'
+import { diff } from './diff'
+import { render, removeDom } from './dom'
 import { toString } from './util'
 
 // Map<symbol, Function)>[]
@@ -45,8 +46,10 @@ export function createComponent(component, props) {
         instance = new Component(props)
         instance.constructor = component
         // 这里注意不能使用 箭头函数 否则 this 指向会无法指定为 instance
+        // TODO：通过 diff 算法，context 组件不会重新生成 只会更新 props 值
+        // 故 应该优先 instance 组件内部的 props
         instance.render = function () {
-            return this.constructor(props)
+            return this.constructor(this.props || props)
         }
     }
 
@@ -67,9 +70,12 @@ export function renderComponent(component) {
     if (toString(renderer) === '[object Array]') {
         const fragment = document.createDocumentFragment()
         renderer.forEach(el => fragment.appendChild(render(el)))
-        base = fragment
+        // base = fragment
+        console.log(fragment, '===')
+        base = diff(fragment, renderer)
     } else {
-        base = render(renderer)
+        // base = render(renderer)
+        base = diff(component.base, renderer)
     }
 
     // 将注册的事件扔队列中 render 后调用
@@ -79,9 +85,9 @@ export function renderComponent(component) {
         _renderCallBacks.push(new Map([[component.__component_id__, component.componentDidMount.bind(component)]]))
     }
 
-    if (component.base && component.base.parentNode) {
-        component.base.parentNode.replaceChild(base, component.base)
-    }
+    // if (component.base && component.base.parentNode) {
+    //     component.base.parentNode.replaceChild(base, component.base)
+    // }
 
     // component => base
     component.base = base
@@ -102,4 +108,9 @@ export function setComponentProps(component, props) {
     component.props = props
 
     renderComponent(component)
+}
+
+export function componentUnmount(component: React.Component) {
+    component?.componentWillUnmount?.()
+    removeDom(component.base)
 }

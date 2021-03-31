@@ -11,6 +11,8 @@ declare global {
                 callback?: () => void
             ): void
             render?(): Vnode
+
+            base?: HTMLElement
         }
     }
 }

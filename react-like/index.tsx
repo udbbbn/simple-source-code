@@ -7,7 +7,7 @@ const Welcome = <h1>Hello, react-like</h1>
 
 export const MyContext = React.createContext({ a: 'test' })
 
-class App extends Component {
+class App extends Component<any, any> {
     constructor(props) {
         super(props)
         this.state = {

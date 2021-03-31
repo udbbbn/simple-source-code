@@ -30,7 +30,7 @@ export function render(vnode: Vnode | string) {
     if (typeof vnode.tag === 'function') {
         const component = createComponent(vnode.tag, { ...vnode.attrs, children: vnode.children })
 
-        setComponentProps(component, vnode.attrs)
+        setComponentProps(component, { ...vnode.attrs, children: vnode.children })
 
         return component.base
     }
@@ -55,7 +55,7 @@ export function render(vnode: Vnode | string) {
     return dom
 }
 
-function setAttribute(dom: HTMLElement, key, val: string) {
+export function setAttribute(dom: HTMLElement, key, val: string) {
     // 将 className 转 class
     if (key === 'className') key = 'class'
 
@@ -87,5 +87,11 @@ function setAttribute(dom: HTMLElement, key, val: string) {
         } else {
             dom.removeAttribute(key)
         }
+    }
+}
+
+export function removeDom(dom) {
+    if (dom?.parentNode) {
+        dom.parentNode.removeChild(dom)
     }
 }
