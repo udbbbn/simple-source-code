@@ -17,7 +17,6 @@ export const executeRenderCallBack = componentId => {
 
 class Component<P = {}, S = {}> implements React.Component<P, S> {
     __component_id__: symbol
-    // 这里应该提供范型 但是先 any
     state: S
     props: P
 
@@ -69,14 +68,20 @@ export function renderComponent(component) {
     // 如果是 fragment renderer 结果会为多个
     if (toString(renderer) === '[object Array]') {
         const fragment = document.createDocumentFragment()
-        renderer.forEach(el => fragment.appendChild(render(el)))
-        // base = fragment
-        console.log(fragment, '===')
-        base = diff(fragment, renderer)
+        // 为了解决 fragment 多子节点造成 diff 索引找不到正确的 dom 元素
+        // 方案：外层包一个 div 同早起taro h5编译方案
+        renderer.forEach(el => {
+            fragment.appendChild(render(el))
+        })
+        const wrapper = document.createElement('div');
+        wrapper['__isFragment'] = true;
+        wrapper.appendChild(fragment)
+        base = diff(wrapper, renderer)
     } else {
         // base = render(renderer)
         base = diff(component.base, renderer)
     }
+
 
     // 将注册的事件扔队列中 render 后调用
     if (component.base) {
