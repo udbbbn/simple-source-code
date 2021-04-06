@@ -28,8 +28,8 @@ class App extends Component<any, any> {
         return (
             <div id="test">
                 Hello, react-like {this.state.count}
-                <React.Fragment>
-                    <div>hello</div>
+                <React.Fragment key="fragment">
+                    <div key='hello'>hello</div>
                     fragment
                 </React.Fragment>
                 <div

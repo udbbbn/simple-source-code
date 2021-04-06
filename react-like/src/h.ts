@@ -15,8 +15,18 @@ function createElement(tag, attrs, children): Vnode {
     }
 }
 
-export function Fragment(props) {
+function _Fragment(props) {
     return props.children
+}
+
+export function Fragment({children = [], ...attrs}): Vnode {
+    console.log(32131231231)
+    console.log('fragment', children, attrs, 'fragment')
+    return {
+        tag: _Fragment,
+        attrs,
+        children
+    }
 }
 
 export { createElement }

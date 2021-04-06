@@ -32,6 +32,7 @@ class Component<P = {}, S = {}> implements React.Component<P, S> {
     }
 }
 
+
 export default Component
 
 export function createComponent(component, props) {
@@ -69,16 +70,12 @@ export function renderComponent(component) {
     if (toString(renderer) === '[object Array]') {
         const fragment = document.createDocumentFragment()
         // 为了解决 fragment 多子节点造成 diff 索引找不到正确的 dom 元素
-        // 方案：外层包一个 div 同早起taro h5编译方案
+        // 方案：diff children 时将 fragment 子节点展开
         renderer.forEach(el => {
             fragment.appendChild(render(el))
         })
-        const wrapper = document.createElement('div');
-        wrapper['__isFragment'] = true;
-        wrapper.appendChild(fragment)
-        base = diff(wrapper, renderer)
+        base = diff(fragment, renderer)
     } else {
-        // base = render(renderer)
         base = diff(component.base, renderer)
     }
 
@@ -89,10 +86,6 @@ export function renderComponent(component) {
     } else if (component.componentDidMount) {
         _renderCallBacks.push(new Map([[component.__component_id__, component.componentDidMount.bind(component)]]))
     }
-
-    // if (component.base && component.base.parentNode) {
-    //     component.base.parentNode.replaceChild(base, component.base)
-    // }
 
     // component => base
     component.base = base

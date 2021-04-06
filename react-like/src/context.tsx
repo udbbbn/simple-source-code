@@ -11,13 +11,10 @@ class Context<T> {
     // 否则 会将 this 绑定到 React 对象上
     Provider = (props: { value: T; children? }) => {
         this.state = { ...props.value }
-
         return props.children
     }
 
     Consumer = props => {
-        console.log(props, this.state)
-
         return props.children(this.state)
     }
 }

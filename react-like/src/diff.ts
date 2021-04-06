@@ -1,3 +1,4 @@
+import { Fragment } from '.'
 import { Vnode } from './../types/index.d'
 import { componentUnmount, createComponent, renderComponent, setComponentProps } from './component'
 import { removeDom, setAttribute } from './dom'
@@ -119,6 +120,12 @@ function diffChildren(dom, vChildren) {
     if (vChildren?.length) {
         let min = 0
         let max = children.length
+
+        // 作用是将 fragment 的子节点展开 避免索引不正确
+        // 能解决 索引不正确 问题
+        // 但是会引发 给 fragmeent 设置 attrs 不生效问题
+        vChildren = vChildren.reduce((t, c) => ([...t, (c.tag === Fragment ? c.children : c)]), []).flat()
+
         vChildren.forEach((vChild, idx) => {
             const { key } = vChild
             let domChild
