@@ -1,6 +1,7 @@
 import { ComponentLifeCycle, Vnode } from './../types/index.d'
 import { diff } from './diff'
 import { render, removeDom } from './dom'
+import { enqueueSetState } from './setState'
 import { toString } from './util'
 
 // Map<symbol, Function)>[]
@@ -19,16 +20,17 @@ class Component<P = {}, S = {}> implements React.Component<P, S> {
     __component_id__: symbol
     state: S
     props: P
+    __prevState: any
 
     constructor(props = {}) {
         this.__component_id__ = Symbol()
+        this.__prevState = null
         this.state = {} as S
         this.props = props as P
     }
 
-    setState(nextState) {
-        this.state = { ...this.state, ...nextState }
-        renderComponent(this)
+    setState(stateChange) {
+        enqueueSetState(stateChange, this)
     }
 }
 

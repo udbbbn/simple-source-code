@@ -8,3 +8,5 @@ export function isSameNodeType(dom, vnode) {
 
     return dom?._component?.constructor === vnode.tag
 }
+
+export const defer = fn => Promise.resolve().then(fn)

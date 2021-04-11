@@ -21,7 +21,13 @@ class App extends Component<any, any> {
 
     componentDidMount() {
         console.log('componentDidMount #test dom:', document.querySelector('#test'))
-        this.setState({ count: Math.random() })
+        for(let i = 0;i < 100; i++) {
+            // this.state({ count: i })
+            this.setState((prev) => {
+                console.log(prev.count)
+                return { count: ++prev.count }
+            });
+        }
     }
 
     render() {
