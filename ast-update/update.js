@@ -166,6 +166,52 @@ function getModulePropKey(code, filePath) {
         // );
       }
     },
+    /**
+     * 将 show 方法中的 this.setState({ // ... }) 
+     * 
+     * To
+     * 
+     * this.setState({ // ..., initLoading: false })
+     *
+     */ 
+    enter(path) {
+      if (path.node.type === "ClassMethod" && path.node.key.name === "show") {
+        const target =
+          path.node.body.body[0].alternate?.body[0].expression.arguments[0]
+            .properties;
+        if (
+          path.node.body.body[0].alternate &&
+          path.node.body.body[0].alternate.body
+        ) {
+          path.node.body.body[0].alternate.body[0].expression.arguments[0].properties =
+            [
+              ...target,
+              t.objectProperty(
+                t.stringLiteral("initLoading"),
+                t.booleanLiteral(false)
+              ),
+            ];
+        }
+      }
+      /**
+       * 将 getDetail 中的 this.setState({ // ... , initLoading: true, // ... })
+       * 
+       * To
+       * 
+       * this.setState({ //... , // ... })
+       */
+      if (
+        path.node.type === "ClassProperty" &&
+        path.node.key.name === "getDetail"
+      ) {
+        const target =
+          path.node.value.body.body[0].expression.arguments[0].properties;
+        const idx = [...target].findIndex(
+          (el) => el.key.name === "initLoading"
+        );
+        target.splice(idx, 1);
+      }
+    }
   });
 
   const outCode = generate(fileAST, {});
