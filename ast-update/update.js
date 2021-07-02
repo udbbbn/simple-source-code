@@ -211,7 +211,81 @@ function getModulePropKey(code, filePath) {
         );
         target.splice(idx, 1);
       }
-    }
+
+
+      
+    },
+    
+      /**
+       * 
+       * 先遍历 ClassProperty 再遍历子元素
+       * 
+       * 将 () => { //... sourceCode  } 
+       * 
+       * To
+       * 
+       * (res) => { if ( statement )  { //...sourceCode } else {  // ...  }}
+       */
+    ClassProperty(path) {
+      if (path.node.key.name === "onSave") {
+        traverse(
+          path.node,
+          {
+            CallExpression(path) {
+              if (path.node.callee.object?.callee?.object?.name === "rApi") {
+                const target = path.node.arguments[0];
+                if (!target.params.length) {
+                  target.params.push(t.identifier("res"));
+                  const sourceBody = [...target.body.body];
+                  path.node.arguments[0].body.body = [
+                    t.ifStatement(
+                      t.memberExpression(
+                        t.memberExpression(
+                          t.thisExpression(),
+                          t.identifier("state")
+                        ),
+                        t.identifier("id")
+                      ),
+                      t.blockStatement([...sourceBody]),
+                      t.blockStatement([
+                        t.expressionStatement(
+                          t.callExpression(
+                            t.memberExpression(
+                              t.thisExpression(),
+                              t.identifier("setState")
+                            ),
+                            [
+                              t.objectExpression([
+                                t.spreadElement(t.identifier("res")),
+                              ]),
+                              t.arrowFunctionExpression(
+                                [],
+                                t.blockStatement([
+                                  t.expressionStatement(
+                                    t.callExpression(
+                                      t.memberExpression(
+                                        t.thisExpression(),
+                                        t.identifier("actionDone")
+                                      ),
+                                      []
+                                    )
+                                  ),
+                                ])
+                              ),
+                            ]
+                          )
+                        ),
+                      ])
+                    ),
+                  ];
+                }
+              }
+            },
+          },
+          path
+        );
+      }
+    },
   });
 
   const outCode = generate(fileAST, {});
