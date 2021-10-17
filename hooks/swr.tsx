@@ -1,25 +1,25 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 
 type options = {
-  // 是否聚焦时自动请求接口
+  /** 是否聚焦时自动请求接口 */
   revalidateOnFocus: boolean
-  // 重新连接时重新请求
+  /** 重新连接时重新请求 */
   revalidateOnReconnect: boolean
-  // 自动刷新时间
+  /** 自动刷新时间 */
   refreshInterval: number
-  // 窗口不可见时进行轮询
+  /** 窗口不可见时进行轮询 */
   refreshWhenHidden: boolean
-  // 浏览器离线时轮询
+  /** 浏览器离线时轮询 */
   refreshWhenOffline: boolean
-  // fetch 有错误时重试
+  /** fetch 有错误时重试 */
   shouldRetryOnError: boolean
-  // 错误重试的时间间隔
+  /** 错误重试的时间间隔 */
   errorRetryInterval: number
-  // 错误重试最大次数 ----------------- 官网说使用了 指数退避算法？
+  /** 错误重试最大次数 ----------------- 官网说使用了 指数退避算法？ */
   errorRetryCount?: number
-  // 请求成功时的回调函数
+  /** 请求成功时的回调函数 */
   onSuccess?: (data, key, config) => void
-  // 请求失败时的回调函数
+  /** 请求失败时的回调函数 */
   onError?: (data, key, config) => void
 }
 
