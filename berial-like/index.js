@@ -1,6 +1,12 @@
 const apps = [];
 
-export function define(view, route) {
+/* 此处做了 RAF 的兼容 但是在下一个 tag 版本中被删除 */
+const defer =
+  typeof requestAnimationFrame !== "undefined"
+    ? requestAnimationFrame
+    : setTimeout;
+
+export function define(tag, component, route) {
   /**
    * 原生自定义组件
    * https://developer.mozilla.org/zh-CN/docs/Web/API/Window/customElements
@@ -9,20 +15,20 @@ export function define(view, route) {
     constructor() {
       super();
       const template = document.createElement("template");
-      template.innerHTML = "<div></div>";
+      template.innerHTML = `<!-- ${tag} -- ${route}  -->`;
       this.attachShadow({ mode: "open" }).appendChild(template.cloneNode(true));
     }
   }
 
-  const hasDef = window.customElements.get("berial-app");
+  const hasDef = window.customElements.get(tag);
   if (!hasDef) {
-    window.customElements.define("berial-app", Berial);
+    window.customElements.define(tag, Berial);
   }
 
   apps.push({
-    view,
+    tag,
+    component,
     route,
-    Berial,
   });
 
   return invoke();
@@ -32,23 +38,15 @@ function invoke() {
   /* 根据路由去加载组件 */
   const path = window.location.hash || window.location.pathname;
 
-  const comps = apps.filter((item) => item.route === path).map(shouldLoad);
-
-  return Promise.all(comps)
-    .then(() => apps)
-    .catch((err) => console.log(err));
-}
-
-function shouldLoad(app) {
-  const p = app.view({});
-  return p
-    .then((module) => queueJob(module.render, app.Berial))
-    .catch((err) => app);
-}
-
-function queueJob(queue, Berial) {
-  queue.forEach((render) => {
-    render(document.querySelector("berial-app").shadowRoot);
+  apps.forEach((app) => {
+    defer(() => {
+      const host = document.querySelector(app.tag);
+      if (app.route === path) {
+        app.component.mount(host);
+      } else {
+        app.component.unmount(host);
+      }
+    });
   });
 }
 
