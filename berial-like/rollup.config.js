@@ -1,4 +1,5 @@
 import typescript from 'rollup-plugin-typescript2'
+import replace from '@rollup/plugin-replace'
 
 export default {
   input: 'src/index.ts',
@@ -16,5 +17,11 @@ export default {
       name: 'berial',
     },
   ],
-  plugins: [typescript()],
+  plugins: [
+    replace({
+      preventAssignment: true,
+      __DEV__: process.env.NODE_DEV !== 'production',
+    }),
+    typescript(),
+  ],
 }

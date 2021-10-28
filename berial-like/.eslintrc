@@ -20,6 +20,9 @@
     }
   },
   "plugins": ["@typescript-eslint"],
+  "globals": {
+    "__DEV__": true
+  },
   "env": {
     "browser": true
   },

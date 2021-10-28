@@ -26,6 +26,13 @@
 
         berial.define('app-one', One, '#/app1')
         berial.define('app-two', Two, '#/app2')
+
+        /* 测试 sandbox */
+        window.a = 1;
+        berial.sandbox.mount()
+        berial.sandbox.sandbox.proxyWindow.b = 2;
+        /* 这里会输出 window 对象的a属性 跟 沙箱内代理对象的 b 属性 */
+        console.log(berial.sandbox.sandbox.proxyWindow.a, berial.sandbox.sandbox.proxyWindow.b)
       })(window)
     </script>
   </head>

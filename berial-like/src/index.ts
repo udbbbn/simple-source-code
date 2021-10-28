@@ -1,4 +1,5 @@
 import { App } from './types'
+import Sandbox from './sandbox'
 
 const apps: App[] = []
 
@@ -77,6 +78,8 @@ function process(app: App, host: HTMLElement) {
     app.component.unmount(host)
   }
 }
+
+export const sandbox = Sandbox
 
 window.addEventListener('hashchange', invoke)
 window.addEventListener('popstate', invoke)

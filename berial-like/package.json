@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
+    "@rollup/plugin-replace": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "eslint": "^8.1.0",
