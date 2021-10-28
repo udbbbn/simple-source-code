@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "sourceMap": true,
+        "declaration": true, /* 生成 d.ts */
+        "noImplicitAny": true, /* 不允许任何显式或隐式 any */
+        "target": "ES6",
+        "module": "ES6",
+        "moduleResolution": "node", /* 使用何种模式去解析模块 */
+        "esModuleInterop": true, /* 允许使用 es6 import 引入 commentjs 包 */
+        "allowSyntheticDefaultImports": true, /* 允许从没有设置默认导出的模块中默认导入 */
+        "downlevelIteration": true, /* 允许迭代器进行迭代 e.g. [...Array(3).keys()] */
+        "jsx": "react",
+        "lib": ["ES6", "DOM"],
+        "baseUrl": ".", 
+        "outDir": "./dist"
+    },
+    "include": ["./src/**/*"], 
+    "exclude": ["node_modules"]
+}
