@@ -9,8 +9,8 @@
   "scripts": {
     "dev": "rollup -c --watch",
     "build": "rollup -c",
-    "lint": "eslint '{src,mock,config}/**/*.{ts,tsx}'",
-    "lint:fix": "eslint --fix '{src,mock,config}/**/*.{ts,tsx}'",
+    "lint": "eslint **/*.ts",
+    "fix": "eslint **/*.ts --fix",
     "type": "tsc --project tsconfig.json --skipLibCheck --noEmit"
   },
   "author": "",
@@ -37,12 +37,8 @@
     }
   },
   "lint-staged": {
-    "*.{less,md,json}": [
-      "prettier --write"
-    ],
     "*.ts?(x)": [
-      "npm run lint:fix",
-      "git add"
+      "npm run fix"
     ]
   }
 }
