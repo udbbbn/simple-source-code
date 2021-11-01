@@ -1,5 +1,6 @@
 import { App, Lifecycle } from './types'
 import Sandbox from './sandbox'
+import parseScriptFn from './html/parseScript'
 
 /* 生命周期 */
 const NOT_LOADED = 'NOT_LOADED'
@@ -274,3 +275,4 @@ window.history.pushState = patchedUpdateState(window.history.pushState)
 window.history.replaceState = patchedUpdateState(window.history.replaceState)
 
 export const sandbox = Sandbox
+export const parseScript = parseScriptFn
