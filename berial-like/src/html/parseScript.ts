@@ -2,15 +2,17 @@
 const ANY_OR_NO_PROPERTY = /["'=\w\s]*/
 /* ---------- 当使用构造函数创造正则对象时，需要常规的字符转义规则（在前面加反斜杠 \）------------ */
 /* 匹配 script 标签中 src 的值 */
-const SCRIPT_URL_RE = new RegExp(
+export const SCRIPT_URL_RE = new RegExp(
   `<script${ANY_OR_NO_PROPERTY.source}(?:src="(.+?)")${ANY_OR_NO_PROPERTY.source}(?:\/>|>[\\s]*<\/script>)?`,
   'g'
 )
 /* 匹配 script 标签中 content 的值 */
-const SCRIPT_CONTENT_RE = new RegExp(
+export const SCRIPT_CONTENT_RE = new RegExp(
   `<script${ANY_OR_NO_PROPERTY.source}>([\\w\\W]+?)</script>`,
   'g'
 )
+/* 匹配 script 标签 */
+export const SCRIPT_ANY_RE = /<script[^>]*>[\s\S]*?(?:<\s*\/script[^>]*>)/g
 
 export default function parseScript(template: string) {
   const scriptURLs: string[] = []
