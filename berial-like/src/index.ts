@@ -205,7 +205,7 @@ async function createShadow(app: App) {
   })
 }
 
-function compose(fns: any[]) {
+function compose(fns: ((props: any) => Promise<any>)[]) {
   fns = Array.isArray(fns) ? fns : [fns]
   return (props: any) =>
     fns.reduce((p, fn) => p.then(() => fn(props)), Promise.resolve())

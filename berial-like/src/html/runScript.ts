@@ -1,3 +1,5 @@
+import { PromiseFn } from '../types'
+
 /**
  * 这里注意 WindowProxy
  * WindowProxy 对象委托给当前窗口 当我们获取 Window 对象时
@@ -9,18 +11,23 @@ export default function runScript(
   script: string,
   global: WindowProxy = window
 ) {
-  let bootstrap!: Promise<any>, mount!: Promise<any>, unmount!: Promise<any>
+  let bootstrap!: PromiseFn,
+    mount!: PromiseFn,
+    unmount!: PromiseFn,
+    update!: PromiseFn
 
   eval(`(function(window){
       ${script}
       bootstrap = window.bootstrap;
       mount = window.mount;
       unmount = window.unmount;
+      update = window.update;
   })(global)`)
 
   return {
     bootstrap,
     mount,
     unmount,
+    update,
   }
 }

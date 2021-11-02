@@ -12,29 +12,29 @@ const SCRIPT_CONTENT_RE = new RegExp(
   'g'
 )
 
-export default function parseScript(html: string) {
-  const scriptUrls: string[] = []
+export default function parseScript(template: string) {
+  const scriptURLs: string[] = []
   const scripts: string[] = []
   let match
 
-  while ((match = SCRIPT_URL_RE.exec(html))) {
+  while ((match = SCRIPT_URL_RE.exec(template))) {
     /**
      * 形如 '<script src="      "></script>' 是可以被捕获的
      * 所以需要 trim 判断
      */
     const captured = match[1].trim()
     if (!captured) continue
-    scriptUrls.push(captured)
+    scriptURLs.push(captured)
   }
 
-  while ((match = SCRIPT_CONTENT_RE.exec(html))) {
+  while ((match = SCRIPT_CONTENT_RE.exec(template))) {
     const captured = match[1].trim()
     if (!captured) continue
     scripts.push(captured)
   }
 
   return {
-    scriptUrls,
+    scriptURLs,
     scripts,
   }
 }

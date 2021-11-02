@@ -15,3 +15,5 @@ export type Lifecycle = {
   mount: any
   unmount: any
 }
+
+export type PromiseFn = (...arg: any[]) => Promise<any>
