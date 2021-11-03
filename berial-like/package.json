@@ -11,7 +11,8 @@
     "build": "rollup -c",
     "lint": "eslint **/*.ts",
     "fix": "eslint **/*.ts --fix",
-    "type": "tsc --project tsconfig.json --skipLibCheck --noEmit"
+    "type": "tsc --project tsconfig.json --skipLibCheck --noEmit",
+    "serve": "parcel ./test/*.html"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +27,7 @@
     "eslint-plugin-react": "^7.26.1",
     "husky": "^7.0.4",
     "lint-staged": "^11.2.6",
+    "parcel": "^2.0.0",
     "prettier": "^2.4.1",
     "rollup": "^2.58.3",
     "rollup-plugin-typescript2": "^0.30.0",

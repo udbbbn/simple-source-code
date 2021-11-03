@@ -19,4 +19,4 @@ function createSandboxWithLifeCycle(global?: Window) {
   }
 }
 
-export default createSandboxWithLifeCycle()
+export default createSandboxWithLifeCycle

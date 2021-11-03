@@ -1,9 +1,10 @@
+import ProxySandbox from 'src/sandbox/proxySandbox'
 import { PromiseFn } from 'src/types'
-import { fetchURL } from 'src/utils/fetch'
+import { request } from 'src/utils'
 import parseScript from './parseScript'
 import runScript from './runScript'
 
-interface ScriptExports {
+export interface ScriptExports {
   bootstrap: PromiseFn[]
   mount: PromiseFn[]
   unmount: PromiseFn[]
@@ -14,12 +15,13 @@ interface ScriptExports {
 /* 后续 global 应该为各个子应用的沙箱 window */
 export default async function loadScript(
   template: string,
-  global: WindowProxy = window
+  global: ProxySandbox['proxyWindow'],
+  name: string
 ): Promise<ScriptExports> {
   /* 解析 script */
   const { scriptURLs, scripts } = parseScript(template)
   /* 加载 script 并存入变量 */
-  const fetchScripts = await Promise.all(scriptURLs.map((url) => fetchURL(url)))
+  const fetchScripts = await Promise.all(scriptURLs.map((url) => request(url)))
 
   const scriptToLoad = fetchScripts.concat(scripts)
 
@@ -29,7 +31,7 @@ export default async function loadScript(
     update: PromiseFn[] = []
   /* 执行 script 并将生命周期收集 */
   scriptToLoad.forEach((script) => {
-    const lifecycle = runScript(script, global)
+    const lifecycle = runScript(script, global, name)
 
     bootstrap.push(lifecycle.bootstrap)
     mount.push(lifecycle.mount)

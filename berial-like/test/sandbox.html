@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>快速上手</title>
+    <script src="../dist/umd/index.js"></script>
+    <script>
+      const { sandbox: box1, mount: box1Mount } = new berial.createSandbox()
+      box1Mount()
+      const { sandbox: box2, mount: box2Mount } = new berial.createSandbox()
+      box2Mount()
+      window.a = 0
+      ;((window) => {
+        window.a = 1
+        console.log(window.a) //1
+      })(box1.proxyWindow)
+      ;((window) => {
+        console.log(window.a) //0
+      })(box2.proxyWindow)
+      console.log(window.a) //0
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -6,7 +6,7 @@ export type App = {
   props: Record<string, unknown>
   status: string
   loaded?: any /* 加载组件的主方法 -> 传入的加载方法 */
-  load: any /* 传入的加载方法 | html? */
+  loadLifecycle: any /* 传入的生命周期 | html? */
 } & Lifecycle
 
 export type Lifecycle = {

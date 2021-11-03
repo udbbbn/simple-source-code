@@ -7,18 +7,12 @@
   </head>
 
   <body>
-    <a onclick="a()">应用1</a>
-    <a onclick="b()">应用2</a>
+    <a href="#/app1">应用1</a>
+    <a href="#/app2">应用2</a>
     <one-app></one-app>
     <two-app></two-app>
     <script src="../dist/umd/index.js"></script>
     <script>
-      function a() {
-        history.pushState({}, '', '/a')
-      }
-      function b() {
-        history.pushState({}, '', '/b')
-      }
       berial.register(
         'one-app',
         async (props) => {
@@ -37,8 +31,7 @@
             },
           }
         },
-        (location) => location.pathname.startsWith('/a'), // 根据路径来判断是否应该加载
-        { store: { name: 'zf', age: 10 } }
+        (location) => location.hash === '#/app1'
       )
       berial.register(
         'two-app',
@@ -56,23 +49,9 @@
             },
           }
         },
-        (location) => location.pathname.startsWith('/b'),
-        { store: { name: 'zf', age: 10 } }
+        (location) => location.hash === '#/app2'
       )
       berial.start()
-
-      const { scriptUrls, scripts } = berial.parseScript(`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="./test.js" />
-</head>
-<body></body>
-</html>`)
-      console.log('scriptUrls, scripts', scriptUrls, scripts)
     </script>
   </body>
 </html>

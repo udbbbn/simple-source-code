@@ -1,3 +1,4 @@
+import ProxySandbox from 'src/sandbox/proxySandbox'
 import { PromiseFn } from '../types'
 
 /**
@@ -9,20 +10,25 @@ import { PromiseFn } from '../types'
  */
 export default function runScript(
   script: string,
-  global: WindowProxy = window
+  //   global: WindowProxy = window,
+  global: ProxySandbox['proxyWindow'],
+  umdName: string
 ) {
   let bootstrap!: PromiseFn,
     mount!: PromiseFn,
     unmount!: PromiseFn,
     update!: PromiseFn
 
-  eval(`(function(window){
-      ${script}
-      bootstrap = window.bootstrap;
-      mount = window.mount;
-      unmount = window.unmount;
-      update = window.update;
-  })(global)`)
+  /* 暂时使用 log 来避免变量被 tree shaking */
+  console.log('umdName', umdName)
+
+  eval(`(function(window, umdName){
+      ${script};
+      bootstrap = window[umdName].bootstrap;
+      mount = window[umdName].mount;
+      unmount = window[umdName].unmount;
+      update = window[umdName].update;
+  })(global, umdName)`)
 
   return {
     bootstrap,

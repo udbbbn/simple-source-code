@@ -1,4 +1,4 @@
-import { warn } from '../utils/error'
+import { warn } from '../utils'
 
 class ProxySandbox {
   isActivated = false
