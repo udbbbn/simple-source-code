@@ -19,7 +19,7 @@ export default function runScript(
     update!: PromiseFn
 
   /* 暂时使用 log 来避免变量被 tree shaking */
-  console.log('umdName', umdName)
+  console.log('umdName', umdName, global)
 
   eval(`(function(window, umdName){
       ${script};

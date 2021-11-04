@@ -132,7 +132,7 @@ async function runLoad(app: App) {
     let lifecycle: Lifecycle | null = null
     if (typeof app.entry === 'string') {
       // 当前 demo 未走到该分支
-      lifecycle = await importHTML(app.entry, app.name)
+      lifecycle = await importHTML(app)
     } else {
       lifecycle = await app.entry(app.props)
     }
