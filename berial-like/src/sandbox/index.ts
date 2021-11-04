@@ -1,5 +1,6 @@
 export async function loadSandbox(host: HTMLElement) {
   const originalWindow = window
+  patchShadowDOM(host)
   return new Promise(async (resolve) => {
     const iframe = await loadIframe()
     const proxy = new Proxy(iframe.contentWindow as WindowProxy, {
@@ -27,5 +28,17 @@ async function loadIframe() {
 
     iframe.onload = () => resolve(iframe)
     document.body.append(iframe)
+  })
+}
+
+function patchShadowDOM(host: HTMLElement) {
+  let title: string
+  Object.defineProperty(host.shadowRoot, 'title', {
+    get() {
+      return title || (document as any)[title]
+    },
+    set(val) {
+      title = val
+    },
   })
 }

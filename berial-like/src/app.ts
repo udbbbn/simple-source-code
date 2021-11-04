@@ -14,6 +14,8 @@ const UNMOUNTING = 'UNMOUNTING'
 let started = false
 const apps: App[] = []
 
+export const getApps = () => apps
+
 export function register(
   name: App['name'],
   entry: App['entry'],
