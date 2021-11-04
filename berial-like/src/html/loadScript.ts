@@ -1,4 +1,3 @@
-import ProxySandbox from 'src/sandbox/proxySandbox'
 import { PromiseFn } from 'src/types'
 import { request } from 'src/utils'
 import parseScript from './parseScript'
@@ -15,7 +14,7 @@ export interface ScriptExports {
 /* 后续 global 应该为各个子应用的沙箱 window */
 export default async function loadScript(
   template: string,
-  global: ProxySandbox['proxyWindow'],
+  global: ProxyConstructor,
   name: string
 ): Promise<ScriptExports> {
   /* 解析 script */

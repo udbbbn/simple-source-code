@@ -1,4 +1,3 @@
-import ProxySandbox from 'src/sandbox/proxySandbox'
 import { PromiseFn } from '../types'
 
 /**
@@ -11,7 +10,7 @@ import { PromiseFn } from '../types'
 export default function runScript(
   script: string,
   //   global: WindowProxy = window,
-  global: ProxySandbox['proxyWindow'],
+  global: ProxyConstructor,
   umdName: string
 ) {
   let bootstrap!: PromiseFn,

@@ -1,22 +1,26 @@
-import ProxySandbox from './proxySandbox'
-
-function createSandboxWithLifeCycle(global?: Window) {
-  const sandbox = new ProxySandbox(global ?? window)
-
-  /* 这里注意使用了 async 返回了一个Promise */
-  const mount = async () => {
-    sandbox.activate()
-  }
-
-  const unmount = async () => {
-    sandbox.deactivate()
-  }
-
-  return {
-    sandbox,
-    mount,
-    unmount,
-  }
+export async function loadSandbox() {
+  const originalWindow = window
+  return new Promise(async (resolve) => {
+    const iframe = await loadIframe()
+    const proxy = new Proxy(iframe.contentWindow as WindowProxy, {
+      get: (target: Record<PropertyKey, any>, key: string) => {
+        return target[key] || originalWindow[key as keyof Window]
+      },
+      set: (target: Record<PropertyKey, any>, key: string, val) => {
+        target[key] = val
+        return true
+      },
+    })
+    resolve(proxy)
+  })
 }
 
-export default createSandboxWithLifeCycle
+async function loadIframe() {
+  return new Promise<HTMLIFrameElement>((resolve) => {
+    const iframe = document.createElement('iframe')
+    iframe.style.cssText = `position: absolute; top: -99999px; width: 1px; height: 1px`
+
+    iframe.onload = () => resolve(iframe)
+    document.body.append(iframe)
+  })
+}

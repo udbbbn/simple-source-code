@@ -14,6 +14,7 @@ export type Lifecycle = {
   bootstrap: any
   mount: any
   unmount: any
+  update: any
 }
 
 export type PromiseFn = (...arg: any[]) => Promise<any>

@@ -136,11 +136,12 @@ async function runLoad(app: App) {
     } else {
       lifecycle = await app.entry(app.props)
     }
-    let host = await createShadow(app)
+    let host = await loadShadow(app)
     app.status = NOT_BOOTSTRAPPED
     app.bootstrap = compose(lifecycle?.bootstrap)
     app.mount = compose(lifecycle?.mount)
     app.unmount = compose(lifecycle?.unmount)
+    app.update = compose(lifecycle?.update)
     app.host = host as HTMLElement
     delete app.loaded
     return app
@@ -182,7 +183,7 @@ async function runUnmount(app: App) {
 }
 
 /* 创建原生自定义组件 */
-async function createShadow(app: App) {
+async function loadShadow(app: App) {
   return new Promise((resolve, reject) => {
     try {
       class Berial extends HTMLElement {
