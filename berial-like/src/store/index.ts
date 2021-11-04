@@ -1,4 +1,4 @@
-import { getApps } from 'src/app'
+import { getApps, Status } from 'src/app'
 
 /**
  * 该文件暂时未使用
@@ -9,14 +9,15 @@ type Store = Record<PropertyKey, any>
 
 let isUpdating = false
 
-export function reactive(store: Store) {
-  const reactiveStore = new Proxy(store, {
+export function reactiveStore(store: Store) {
+  return new Proxy(store, {
     get(target, key) {
       return Reflect.get(target, key)
     },
     set(target, key, value) {
       Reflect.set(target, key, value)
       isUpdating = true
+      /* reactiveStore 这里传入函数 暂时没看懂 */
       batchUpdate(reactiveStore)
       return true
     },
@@ -28,7 +29,9 @@ function batchUpdate(store: Store) {
   const apps = getApps()
   Promise.resolve().then(() => {
     apps.forEach((app) => {
-      app.update()
+      app.status = Status.UPDATING
+      app.update(store, apps)
+      app.status = Status.UPDATE
     })
     isUpdating = false
   })

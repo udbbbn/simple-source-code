@@ -8,7 +8,7 @@ import { App } from 'src/types'
 export async function importHTML(app: App) {
   /* replacedTemplate 当前版本似乎没派上用场 */
   const loadedHTMLs = await loadAndReplaceHTMLs([
-    { name: app.name, url: app.entry },
+    { name: app.name, url: app.entry as string },
   ])
   const { originalTemplate } = loadedHTMLs[app.name]
   const sandbox = (await loadSandbox(app.host)) as ProxyConstructor

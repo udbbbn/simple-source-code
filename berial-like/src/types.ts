@@ -2,8 +2,8 @@ import { Status } from './app'
 
 export type App = {
   name: string
-  entry: any
-  match: any /* 路由 */
+  entry: ((props: App['props']) => Lifecycle) | string
+  match: (location: Location) => boolean /* 路由 */
   host: HTMLElement /* dom 对象 */
   props: Record<string, unknown>
   status: Status
@@ -13,10 +13,18 @@ export type App = {
 
 export type Lifecycle = {
   /* 生命周期 */
-  bootstrap: any
-  mount: any
-  unmount: any
-  update: any
+  bootstrap: PromiseFn
+  mount: PromiseFn
+  unmount: PromiseFn
+  update: PromiseFn
 }
 
+export type Lifecycles = ToArray<Lifecycle>
+
 export type PromiseFn = (...arg: any[]) => Promise<any>
+
+export type ToArray<T> = T extends Record<any, any>
+  ? {
+      [K in keyof T]: T[K][]
+    }
+  : unknown

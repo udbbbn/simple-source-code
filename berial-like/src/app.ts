@@ -1,5 +1,6 @@
-import { App, Lifecycle } from './types'
+import { App, Lifecycle, Lifecycles } from './types'
 import { importHTML } from './html'
+import { reactiveStore } from './store'
 
 /* 生命周期 */
 export enum Status {
@@ -10,13 +11,17 @@ export enum Status {
   NOT_MOUNTED = 'NOT_MOUNTED',
   MOUNTING = 'MOUNTING',
   MOUNTED = 'MOUNTED',
+  UPDATING = 'UPDATING',
+  UPDATE = 'UPDATE',
   UNMOUNTING = 'UNMOUNTING',
 }
 
 let started = false
 const apps: App[] = []
+const globalStore = reactiveStore({})
 
 export const getApps = () => apps
+export const getGlobalStore = () => globalStore
 
 export function register(
   name: App['name'],
@@ -24,26 +29,6 @@ export function register(
   match: App['match'],
   props: App['props']
 ) {
-  /* 此处源码也不再对 string 类型做兼容 不太理解 所以暂时不屏蔽 */
-  if (typeof match === 'string') {
-    match = (location: Window['location']) =>
-      location.pathname.startsWith(match)
-  }
-
-  /* 此处看示例暂时将 props 去掉了
-  if (props) {
-    props = new Proxy(props, {
-      get(target, key: string) {
-        return target[key]
-      },
-      set(target, key: string, val) {
-        target[key] = val
-        reroute()
-        return true
-      },
-    })
-  } */
-
   apps.push({
     name,
     entry,
@@ -133,19 +118,26 @@ async function runLoad(app: App) {
   }
   app.loaded = Promise.resolve().then(async () => {
     app.status = Status.LOADING
-    let lifecycle: Lifecycle | null = null
+    let lifecycle: Lifecycles
     if (typeof app.entry === 'string') {
       // 当前 demo 未走到该分支
       lifecycle = await importHTML(app)
     } else {
-      lifecycle = await app.entry(app.props)
+      const { bootstrap, mount, unmount, update } = (await app.entry(
+        app.props
+      )) as Lifecycle
+      lifecycle = {} as Lifecycles
+      lifecycle.bootstrap = [bootstrap]
+      lifecycle.mount = [mount]
+      lifecycle.unmount = [unmount]
+      lifecycle.update = [update]
     }
     let host = await loadShadow(app)
     app.status = Status.NOT_BOOTSTRAPPED
-    app.bootstrap = compose(lifecycle?.bootstrap)
-    app.mount = compose(lifecycle?.mount)
-    app.unmount = compose(lifecycle?.unmount)
-    app.update = compose(lifecycle?.update)
+    app.bootstrap = compose(lifecycle!.bootstrap)
+    app.mount = compose(lifecycle!.mount)
+    app.unmount = compose(lifecycle!.unmount)
+    app.update = compose(lifecycle!.update)
     app.host = host as HTMLElement
     delete app.loaded
     return app
