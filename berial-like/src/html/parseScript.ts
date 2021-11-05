@@ -1,5 +1,5 @@
-/* 匹配 script 标签中的属性 */
-const MATCH_ANY_OR_NO_PROPERTY = /["'=\w\s/]*/
+/* 匹配标签中的属性 */
+export const MATCH_ANY_OR_NO_PROPERTY = /["'=\w\s/]*/
 /* ---------- 当使用构造函数创造正则对象时，需要常规的字符转义规则（在前面加反斜杠 \）------------ */
 /* 匹配 script 标签中 src 的值 */
 export const SCRIPT_URL_RE = new RegExp(
@@ -12,9 +12,9 @@ export const SCRIPT_CONTENT_RE = new RegExp(
   'g'
 )
 /* 匹配 script 标签 */
-export const SCRIPT_ANY_RE = /<script[^>]*>[\s\S]*?(?:<\s*\/script[^>]*>)/g
+export const SCRIPT_ANY_RE = /<\s*script[^>]*>[\s\S]*?(?:<\s*\/script[^>]*>)/g
 /* 匹配是否为绝对路径域名 */
-const TEST_URL_RE = /(?:https?):\/\/[-a-zA-Z0-9.]+/
+export const TEST_URL_RE = /(?:https?):\/\/[-a-zA-Z0-9.]+/
 
 export default function parseScript(template: string) {
   const scriptURLs: string[] = []

@@ -1,18 +1,19 @@
 import loadScript from './loadScript'
 import parseScript from './parseScript'
 import runScript from './runScript'
-import loadAndReplaceHTMLs from './loadHTML'
 import { loadSandbox } from '../sandbox'
 import { App } from 'src/types'
+import { request } from 'src/utils'
+import loadBody from './loadHTML'
+import loadCSS from './loadCSS'
 
 export async function importHTML(app: App) {
-  /* replacedTemplate 当前版本似乎没派上用场 */
-  const loadedHTMLs = await loadAndReplaceHTMLs([
-    { name: app.name, url: app.entry as string },
-  ])
-  const { originalTemplate } = loadedHTMLs[app.name]
+  const template = await request(app.entry as string)
   const sandbox = (await loadSandbox(app.host)) as ProxyConstructor
-  return await loadScript(originalTemplate, sandbox, app.name)
+  const lifecycle = await loadScript(template, sandbox, app.name)
+  const styleNodes = await loadCSS(template)
+  const bodyNode = loadBody(template)
+  return { lifecycle, styleNodes, bodyNode }
 }
 
-export { loadAndReplaceHTMLs, loadScript, parseScript, runScript }
+export { loadScript, parseScript, runScript }

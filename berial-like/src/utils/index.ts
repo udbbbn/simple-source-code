@@ -46,3 +46,12 @@ export function lifecycleCheck(lifecycle: Lifecycle | Lifecycles) {
     error(__DEV__, '看起来你没有导出 [unmount] 生命周期，这会导致发生错误')
   }
 }
+
+export function appendChildren<T extends HTMLElement | ShadowRoot>(
+  element: T,
+  children: Element[]
+) {
+  for (const child of children) {
+    element.appendChild(child)
+  }
+}

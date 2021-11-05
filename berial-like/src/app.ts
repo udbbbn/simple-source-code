@@ -1,7 +1,7 @@
 import { App, Lifecycle, Lifecycles } from './types'
 import { importHTML } from './html'
 import { reactiveStore } from './store'
-import { lifecycleCheck } from './utils'
+import { appendChildren, lifecycleCheck } from './utils'
 
 /* 生命周期 */
 export enum Status {
@@ -122,10 +122,14 @@ async function runLoad(app: App) {
     let lifecycle: Lifecycles
     let host = await loadShadow(app)
     app.host = host as Element
+    let bodyNode: HTMLDivElement
+    let styleNodes: HTMLStyleElement[]
     if (typeof app.entry === 'string') {
-      // 当前 demo 未走到该分支
-      lifecycle = await importHTML(app)
-      lifecycleCheck(lifecycle)
+      const exports = await importHTML(app)
+      lifecycleCheck(exports.lifecycle)
+      lifecycle = exports.lifecycle
+      bodyNode = exports.bodyNode
+      styleNodes = exports.styleNodes
     } else {
       const exportLifecycles = (await app.entry(app.props)) as Lifecycle
       const { bootstrap, mount, unmount, update } = exportLifecycles
@@ -140,6 +144,7 @@ async function runLoad(app: App) {
       lifecycle.unmount = [unmount]
       lifecycle.update = [update]
     }
+    appendChildren(host.shadowRoot!, [...styleNodes!, bodyNode!])
     app.status = Status.NOT_BOOTSTRAPPED
     app.bootstrap = compose(lifecycle!.bootstrap)
     app.mount = compose(lifecycle!.mount)
@@ -186,7 +191,7 @@ async function runUnmount(app: App) {
 
 /* 创建原生自定义组件 */
 async function loadShadow(app: App) {
-  return new Promise((resolve, reject) => {
+  return new Promise<HTMLElement>((resolve, reject) => {
     try {
       class Berial extends HTMLElement {
         static get componentName() {
