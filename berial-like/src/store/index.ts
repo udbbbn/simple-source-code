@@ -28,9 +28,9 @@ function batchUpdate(store: Store) {
   if (isUpdating) return
   const apps = getApps()
   Promise.resolve().then(() => {
-    apps.forEach((app) => {
+    apps.forEach(async (app) => {
       app.status = Status.UPDATING
-      app.update(store, apps)
+      await app.update(store, apps)
       app.status = Status.UPDATE
     })
     isUpdating = false
