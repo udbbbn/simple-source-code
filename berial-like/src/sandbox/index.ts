@@ -1,6 +1,6 @@
 import { getGlobalStore } from 'src/app'
 
-export async function loadSandbox(host: HTMLElement) {
+export async function loadSandbox(host: Element) {
   const originalWindow = window
   patchShadowDOM(host)
   return new Promise(async (resolve) => {
@@ -35,14 +35,14 @@ async function loadIframe() {
   })
 }
 
-function patchShadowDOM(host: HTMLElement) {
-  let title: string
-  Object.defineProperty(host.shadowRoot, 'title', {
-    get() {
-      return title || (document as any)[title]
+function patchShadowDOM(host: Element) {
+  return new Proxy(host.shadowRoot as ShadowRoot, {
+    get(target: any, key: string) {
+      return target[key] || (document as any)[key]
     },
-    set(val) {
-      title = val
+    set(target, key: string, val) {
+      target[key] = val
+      return true
     },
   })
 }

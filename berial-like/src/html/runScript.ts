@@ -13,10 +13,10 @@ export default function runScript(
   global: ProxyConstructor,
   umdName: string
 ) {
-  let bootstrap!: PromiseFn,
-    mount!: PromiseFn,
-    unmount!: PromiseFn,
-    update!: PromiseFn
+  let bootstrap!: PromiseFn
+  let mount!: PromiseFn
+  let unmount!: PromiseFn
+  let update!: PromiseFn
 
   /* 暂时使用 log 来避免变量被 tree shaking */
   console.log('umdName', umdName, global)
