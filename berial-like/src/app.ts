@@ -1,6 +1,7 @@
 import { App, Lifecycle, Lifecycles } from './types'
 import { importHTML } from './html'
 import { reactiveStore } from './store'
+import { lifecycleCheck } from './utils'
 
 /* 生命周期 */
 export enum Status {
@@ -122,10 +123,15 @@ async function runLoad(app: App) {
     if (typeof app.entry === 'string') {
       // 当前 demo 未走到该分支
       lifecycle = await importHTML(app)
+      lifecycleCheck(lifecycle)
     } else {
-      const { bootstrap, mount, unmount, update } = (await app.entry(
-        app.props
-      )) as Lifecycle
+      const exportLifecycles = (await app.entry(app.props)) as Lifecycle
+      const { bootstrap, mount, unmount, update } = exportLifecycles
+      /**
+       * 这里其实可以直接让 lifecycle = exportLifecycles
+       * 等 compose 方法将钩子转为数组
+       * 但是从类型上会产生误解 (Lifecycle | Lifecycless)
+       */
       lifecycle = {} as Lifecycles
       lifecycle.bootstrap = [bootstrap]
       lifecycle.mount = [mount]
