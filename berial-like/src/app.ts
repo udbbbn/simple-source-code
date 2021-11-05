@@ -120,6 +120,8 @@ async function runLoad(app: App) {
   app.loaded = Promise.resolve().then(async () => {
     app.status = Status.LOADING
     let lifecycle: Lifecycles
+    let host = await loadShadow(app)
+    app.host = host as Element
     if (typeof app.entry === 'string') {
       // 当前 demo 未走到该分支
       lifecycle = await importHTML(app)
@@ -138,13 +140,11 @@ async function runLoad(app: App) {
       lifecycle.unmount = [unmount]
       lifecycle.update = [update]
     }
-    let host = await loadShadow(app)
     app.status = Status.NOT_BOOTSTRAPPED
     app.bootstrap = compose(lifecycle!.bootstrap)
     app.mount = compose(lifecycle!.mount)
     app.unmount = compose(lifecycle!.unmount)
     app.update = compose(lifecycle!.update)
-    app.host = host as Element
     delete app.loaded
     return app
   })

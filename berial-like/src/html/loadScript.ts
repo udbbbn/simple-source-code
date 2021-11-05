@@ -17,10 +17,10 @@ export default async function loadScript(
 
   const scriptToLoad = fetchScripts.concat(scripts)
 
-  let bootstrap: PromiseFn[] = [],
-    mount: PromiseFn[] = [],
-    unmount: PromiseFn[] = [],
-    update: PromiseFn[] = []
+  let bootstrap: PromiseFn[] = []
+  let mount: PromiseFn[] = []
+  let unmount: PromiseFn[] = []
+  let update: PromiseFn[] = []
   /* 执行 script 并将生命周期收集 */
   scriptToLoad.forEach((script) => {
     const lifecycle = runScript(script, global, name)

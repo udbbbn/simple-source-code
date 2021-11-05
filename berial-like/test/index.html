@@ -9,8 +9,10 @@
   <body>
     <a href="#/app1">应用1</a>
     <a href="#/app2">应用2</a>
+    <a href="#/app3">typeof entry === string</a>
     <one-app></one-app>
     <two-app></two-app>
+    <three-app></three-app>
     <script src="../dist/umd/index.js"></script>
     <script>
       berial.register(
@@ -18,11 +20,10 @@
         async (props) => {
           console.log('加载时执行1')
           return {
-            bootstrap: [
-              async (props) => {
-                console.log('bootstrap1')
-              },
-            ],
+            bootstrap: async (props) => {
+              console.log('bootstrap1')
+            },
+
             mount: async (props) => {
               console.log('mount1')
             },
@@ -50,6 +51,11 @@
           }
         },
         (location) => location.hash === '#/app2'
+      )
+      berial.register(
+        'three-app',
+        'http://localhost:1234/umd.html',
+        (location) => location.hash === '#/app3'
       )
       berial.start()
     </script>

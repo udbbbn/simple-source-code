@@ -2,14 +2,18 @@ import { getGlobalStore } from 'src/app'
 
 export async function loadSandbox(host: Element) {
   const originalWindow = window
-  patchShadowDOM(host)
+  const shadowRoot = patchShadowDOM(host)
   return new Promise(async (resolve) => {
     const iframe = await loadIframe()
     const proxy = new Proxy(iframe.contentWindow as WindowProxy, {
       get: (target: Record<PropertyKey, any>, key: string) => {
         switch (key) {
           case 'document':
-            return host.shadowRoot
+            /**
+             * 这个调整暂时还不是很理解
+             * 从原先 host.shadowRoot 改为 proxy 对象
+             */
+            return shadowRoot
           case 'globalStore':
             return getGlobalStore()
           default:

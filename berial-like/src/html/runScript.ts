@@ -21,13 +21,13 @@ export default function runScript(
   /* 暂时使用 log 来避免变量被 tree shaking */
   console.log('umdName', umdName, global)
 
-  eval(`(function(window, umdName){
+  eval(`(function(window, umdName, document){
       ${script};
       bootstrap = window[umdName].bootstrap;
       mount = window[umdName].mount;
       unmount = window[umdName].unmount;
       update = window[umdName].update;
-  })(global, umdName)`)
+  })(global, umdName, global.document)`)
 
   return {
     bootstrap,
