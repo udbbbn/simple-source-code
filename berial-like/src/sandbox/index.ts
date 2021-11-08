@@ -15,7 +15,9 @@ export async function loadSandbox(host: any) {
           case 'store':
             return host.store
           default:
-            return target[key] || originalWindow[key as keyof Window]
+            return key in target
+              ? target[key]
+              : originalWindow[key as keyof Window]
         }
       },
       set: (target: Record<PropertyKey, any>, key: string, val) => {
@@ -40,7 +42,7 @@ async function loadIframe() {
 function patchShadowDOM(host: Element) {
   return new Proxy(host.shadowRoot as ShadowRoot, {
     get(target: any, key: string) {
-      return target[key] || (document as any)[key]
+      return key in target ? target[key] : (document as any)[key]
     },
     set(target, key: string, val) {
       target[key] = val
