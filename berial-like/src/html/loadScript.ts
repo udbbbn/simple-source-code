@@ -1,4 +1,4 @@
-import { Lifecycles, PromiseFn } from 'src/types'
+import type { Lifecycles, PromiseFn } from 'src/types'
 import { request } from 'src/utils'
 import parseScript from './parseScript'
 import runScript from './runScript'

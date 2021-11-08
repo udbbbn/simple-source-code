@@ -1,4 +1,4 @@
-import { Lifecycle, Lifecycles } from 'src/types'
+import type { Lifecycle, Lifecycles } from 'src/types'
 
 export function warn(trigger: boolean): void
 export function warn(trigger: string): void | Error

@@ -1,4 +1,4 @@
-import { App, Lifecycle, Lifecycles } from './types'
+import type { App, Lifecycle, Lifecycles } from './types'
 import { importHTML } from './html'
 import { appendChildren, lifecycleCheck } from './utils'
 
