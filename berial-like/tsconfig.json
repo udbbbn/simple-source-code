@@ -3,6 +3,7 @@
     "strict": true,
     "sourceMap": true,
     "declaration": true /* 生成 d.ts */,
+    "declarationDir": "dist/types/",
     "noImplicitAny": true /* 不允许任何显式或隐式 any */,
     "target": "ES6",
     "module": "ES6",

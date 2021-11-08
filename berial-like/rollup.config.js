@@ -22,6 +22,10 @@ export default {
       preventAssignment: true,
       __DEV__: process.env.NODE_DEV !== 'production',
     }),
-    typescript(),
+    typescript({
+      tsconfig: 'tsconfig.json',
+      removeComments: true,
+      useTsconfigDeclarationDir: true,
+    }),
   ],
 }
