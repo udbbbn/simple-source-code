@@ -4,8 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>umd</title>
+    <link rel="stylesheet" href="./umd.css" />
+    <style>
+      .umd-test {
+        font-size: 24px;
+      }
+    </style>
+    <style>
+      .umd-test2 {
+        color: red;
+      }
+    </style>
   </head>
   <body>
+    <div class="umd-css umd-test">umd</div>
+    <div class="umd-test2">color red</div>
     <script>
       ;(function (root, factory) {
         root['three-app'] = factory()
