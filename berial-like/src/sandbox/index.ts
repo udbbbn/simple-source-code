@@ -1,6 +1,4 @@
-import { getGlobalStore } from 'src/app'
-
-export async function loadSandbox(host: Element) {
+export async function loadSandbox(host: any) {
   const originalWindow = window
   const shadowRoot = patchShadowDOM(host)
   return new Promise(async (resolve) => {
@@ -14,8 +12,8 @@ export async function loadSandbox(host: Element) {
              * 从原先 host.shadowRoot 改为 proxy 对象
              */
             return shadowRoot
-          case 'globalStore':
-            return getGlobalStore()
+          case 'store':
+            return host.store
           default:
             return target[key] || originalWindow[key as keyof Window]
         }

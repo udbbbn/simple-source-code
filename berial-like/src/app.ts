@@ -1,6 +1,5 @@
 import { App, Lifecycle, Lifecycles } from './types'
 import { importHTML } from './html'
-import { reactiveStore } from './store'
 import { appendChildren, lifecycleCheck } from './utils'
 
 /* 生命周期 */
@@ -18,18 +17,15 @@ export enum Status {
 }
 
 let started = false
-const apps: App[] = []
-const globalStore = reactiveStore({})
-
-export const getApps = () => apps
-export const getGlobalStore = () => globalStore
+const apps: any = new Set()
+const deps: any = new Set()
 
 export function register(
   name: App['name'],
   entry: App['entry'],
   match: App['match']
 ) {
-  apps.push({
+  apps.add({
     name,
     entry,
     match,
@@ -37,13 +33,13 @@ export function register(
   } as App)
 }
 
-export function start() {
+export function start(store: any) {
   started = true
-  reroute()
+  reroute(store || {})
 }
 
 /* 加载所有应用并跑钩子 */
-function reroute() {
+function reroute(store: any) {
   const { loads, mounts, unmounts } = getAppChanges()
   if (started) {
     return perform()
@@ -56,7 +52,7 @@ function reroute() {
   async function perform() {
     unmounts.map(runUnmount)
     loads.map(async (app) => {
-      app = await runLoad(app)
+      app = await runLoad(app, store)
       app = await runBootstrap(app)
       return runMount(app)
     })
@@ -72,7 +68,7 @@ function getAppChanges() {
   const loads: App[] = []
   const mounts: App[] = []
   const unmounts: App[] = []
-  apps.forEach((app) => {
+  apps.forEach((app: any) => {
     const isActive = app.match(window.location)
     /**
      * MOUNTING 跟 UNMOUNTING 没有包含在这个 switch 分支内的原因
@@ -111,14 +107,14 @@ function getAppChanges() {
  * async 的函数会返回 promise
  * 函数内返回 app.loaded 也是返回了一个 promise 并在该 promise 内返回了 app
  */
-async function runLoad(app: App) {
+async function runLoad(app: App, store: any) {
   if (app.loaded) {
     return app.loaded
   }
   app.loaded = Promise.resolve().then(async () => {
     app.status = Status.LOADING
     let lifecycle: Lifecycles
-    let host = await loadShadow(app)
+    let host = await loadShadow(app, store)
     app.host = host as Element
     let bodyNode: HTMLDivElement =
       document.createDocumentFragment() as unknown as HTMLDivElement
@@ -129,6 +125,11 @@ async function runLoad(app: App) {
       lifecycle = exports.lifecycle
       bodyNode = exports.bodyNode
       styleNodes = exports.styleNodes
+
+      host.shadowRoot?.appendChild(bodyNode)
+      for (const k of styleNodes) {
+        host.shadowRoot?.insertBefore(k, host.shadowRoot.firstChild)
+      }
     } else {
       const exportLifecycles = (await app.entry(app)) as Lifecycle
       const { bootstrap, mount, unmount, update } = exportLifecycles
@@ -143,7 +144,7 @@ async function runLoad(app: App) {
       lifecycle.unmount = [unmount]
       lifecycle.update = [update]
     }
-    appendChildren(host.shadowRoot!, [...styleNodes!, bodyNode!])
+    // appendChildren(host.shadowRoot!, [...styleNodes!, bodyNode!])
     app.status = Status.NOT_BOOTSTRAPPED
     app.bootstrap = compose(lifecycle!.bootstrap)
     app.mount = compose(lifecycle!.mount)
@@ -189,19 +190,21 @@ async function runUnmount(app: App) {
 }
 
 /* 创建原生自定义组件 */
-async function loadShadow(app: App) {
+async function loadShadow(app: App, store: any) {
   return new Promise<HTMLElement>((resolve, reject) => {
     try {
       class Berial extends HTMLElement {
-        static get componentName() {
+        static get tag() {
           return app.name
         }
         connectedCallback() {
           this.attachShadow({ mode: 'open' })
           resolve(this)
         }
+        store: any
         constructor() {
           super()
+          this.store = loadStore(app, store)
         }
       }
       const hasDef = window.customElements.get(app.name)
@@ -211,6 +214,23 @@ async function loadShadow(app: App) {
     } catch (e) {
       reject(e)
     }
+  })
+}
+
+function loadStore(app: any, store: any) {
+  return new Proxy(store, {
+    get(target, key) {
+      const has = app.deps.has(app)
+      if (!has) {
+        deps.add(app)
+      }
+      return target[key]
+    },
+    set(target, key, value) {
+      target[key] = value
+      deps.forEach((app: App) => app.update(app))
+      return true
+    },
   })
 }
 
@@ -228,7 +248,7 @@ function compose(fns: ((props: App) => Promise<any>)[]) {
  * 此处理解不一定正确
  */
 function urlReroute() {
-  reroute()
+  reroute({})
 }
 
 window.addEventListener('hashchange', urlReroute)

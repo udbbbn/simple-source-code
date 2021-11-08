@@ -6,6 +6,7 @@ export type App = {
   match: (location: Location) => boolean /* 路由 */
   host: Element /* dom 对象 */
   status: Status
+  store?: any
   loaded?: any /* 加载组件的主方法 -> 传入的加载方法 */
   loadLifecycle: any /* 传入的生命周期 | html? */
 } & Lifecycle
