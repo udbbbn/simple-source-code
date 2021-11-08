@@ -4,7 +4,7 @@
 
 ### Feature
 
-- lifecyecle loop
+- lifecycle loop
 
 - shadow dom
 
@@ -13,6 +13,8 @@
 - js sandbox
 
 - html loader
+
+- global store
 
 ### Use
 

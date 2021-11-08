@@ -16,9 +16,9 @@ export function reactiveStore(store: Store) {
     },
     set(target, key, value) {
       Reflect.set(target, key, value)
-      isUpdating = true
       /* reactiveStore 这里传入函数 暂时没看懂 */
       batchUpdate(reactiveStore)
+      isUpdating = true
       return true
     },
   })
