@@ -27,14 +27,12 @@ export const getGlobalStore = () => globalStore
 export function register(
   name: App['name'],
   entry: App['entry'],
-  match: App['match'],
-  props: App['props']
+  match: App['match']
 ) {
   apps.push({
     name,
     entry,
     match,
-    props,
     status: Status.NOT_LOADED,
   } as App)
 }
@@ -132,7 +130,7 @@ async function runLoad(app: App) {
       bodyNode = exports.bodyNode
       styleNodes = exports.styleNodes
     } else {
-      const exportLifecycles = (await app.entry(app.props)) as Lifecycle
+      const exportLifecycles = (await app.entry(app)) as Lifecycle
       const { bootstrap, mount, unmount, update } = exportLifecycles
       /**
        * 这里其实可以直接让 lifecycle = exportLifecycles
@@ -163,7 +161,7 @@ async function runBootstrap(app: App) {
     return app
   }
   app.status = Status.BOOTSTRAPPING
-  await app.bootstrap(app.props)
+  await app.bootstrap(app)
   app.status = Status.NOT_MOUNTED
   return app
 }
@@ -174,7 +172,7 @@ async function runMount(app: App) {
     return app
   }
   app.status = Status.MOUNTING
-  await app.mount(app.props)
+  await app.mount(app)
   app.status = Status.MOUNTED
   return app
 }
@@ -185,7 +183,7 @@ async function runUnmount(app: App) {
     return app
   }
   app.status = Status.UNMOUNTING
-  await app.unmount(app.props)
+  await app.unmount(app)
   app.status = Status.NOT_MOUNTED
   return app
 }
@@ -216,9 +214,9 @@ async function loadShadow(app: App) {
   })
 }
 
-function compose(fns: ((props: any) => Promise<any>)[]) {
+function compose(fns: ((props: App) => Promise<any>)[]) {
   fns = Array.isArray(fns) ? fns : [fns]
-  return (props: any) =>
+  return (props: App) =>
     fns.reduce((p, fn) => p.then(() => fn(props)), Promise.resolve())
 }
 

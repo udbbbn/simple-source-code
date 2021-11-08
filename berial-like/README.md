@@ -4,6 +4,8 @@
 
 ### Feature
 
+- lifecyecle loop
+
 - shadow dom
 
 - scoped css

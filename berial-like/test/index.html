@@ -17,17 +17,17 @@
     <script>
       berial.register(
         'one-app',
-        async (props) => {
+        async (app) => {
           console.log('加载时执行1')
           return {
-            bootstrap: async (props) => {
+            bootstrap: async (app) => {
               console.log('bootstrap1')
             },
 
-            mount: async (props) => {
+            mount: async (app) => {
               console.log('mount1')
             },
-            unmount: async (props) => {
+            unmount: async (app) => {
               console.log('unmount1')
             },
           }
@@ -36,16 +36,16 @@
       )
       berial.register(
         'two-app',
-        async (props) => {
+        async (app) => {
           console.log('加载时执行2')
           return {
-            bootstrap: async (props) => {
+            bootstrap: async (app) => {
               console.log('bootstrap2')
             },
-            mount: async (props) => {
+            mount: async (app) => {
               console.log('mount2')
             },
-            unmount: async (props) => {
+            unmount: async (app) => {
               console.log('unmount2')
             },
           }
