@@ -1,5 +1,5 @@
 import { start, register } from './app'
 import { loadScript, importHTML } from './html'
-import { loadSandbox } from './sandbox'
+import { proxy } from './sandbox'
 
-export { start, register, loadScript, importHTML, loadSandbox }
+export { start, register, loadScript, importHTML, proxy }
