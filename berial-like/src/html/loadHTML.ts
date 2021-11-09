@@ -29,7 +29,7 @@ function scriptReplacer(substring: string) {
 export default function loadBody(template: string) {
   let bodyContent = template.match(BODY_CONTENT_RE)?.[1] ?? ''
   bodyContent = bodyContent.replace(SCRIPT_ANY_RE, scriptReplacer)
-  const div = document.createElement('div')
+  const div = document.createElement('template')
   div.innerHTML = bodyContent
   return div
 }

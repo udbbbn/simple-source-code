@@ -116,8 +116,7 @@ async function runLoad(app: App, store: any) {
     let lifecycle: Lifecycles
     let host = await loadShadow(app, store)
     app.host = host as Element
-    let bodyNode: HTMLDivElement =
-      document.createDocumentFragment() as unknown as HTMLDivElement
+    let bodyNode: HTMLTemplateElement
     let styleNodes: HTMLStyleElement[] = []
     if (typeof app.entry === 'string') {
       const exports = await importHTML(app)
