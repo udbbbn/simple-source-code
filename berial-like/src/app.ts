@@ -114,7 +114,7 @@ async function runLoad(app: App, store: any) {
   app.loaded = Promise.resolve().then(async () => {
     app.status = Status.LOADING
     let lifecycle: Lifecycles
-    let host = await loadShadow(app, store)
+    let host = await loadShadowDOM(app, store)
     app.host = host as Element
     let bodyNode: HTMLTemplateElement
     let styleNodes: HTMLStyleElement[] = []
@@ -125,7 +125,7 @@ async function runLoad(app: App, store: any) {
       bodyNode = exports.bodyNode
       styleNodes = exports.styleNodes
 
-      host.shadowRoot?.appendChild(bodyNode)
+      host.shadowRoot?.appendChild(bodyNode.content.cloneNode(true))
       for (const k of styleNodes) {
         host.shadowRoot?.insertBefore(k, host.shadowRoot.firstChild)
       }
@@ -189,7 +189,7 @@ async function runUnmount(app: App) {
 }
 
 /* 创建原生自定义组件 */
-async function loadShadow(app: App, store: any) {
+async function loadShadowDOM(app: App, store: any) {
   return new Promise<HTMLElement>((resolve, reject) => {
     try {
       class Berial extends HTMLElement {

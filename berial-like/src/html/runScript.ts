@@ -13,26 +13,20 @@ export default function runScript(
   global: ProxyConstructor,
   umdName: string
 ) {
-  let bootstrap!: PromiseFn
-  let mount!: PromiseFn
-  let unmount!: PromiseFn
-  let update!: PromiseFn
+  const resolver = new Function(`
+    return function(window) {
+      window.IS_BERIAL_LIKE_SANDBOX = true;
+      with(window.IS_BERIAL_LIKE_SANDBOX) {
+        try {
+          ${script}
+          return window['${umdName}']
+        }
+        catch(e) {
+          console.log(e)
+        }
+      }
+    }
+  `)
 
-  /* 暂时使用 log 来避免变量被 tree shaking */
-  console.log('umdName', umdName, global)
-
-  eval(`(function(window, umdName, document){
-      ${script};
-      bootstrap = window[umdName].bootstrap;
-      mount = window[umdName].mount;
-      unmount = window[umdName].unmount;
-      update = window[umdName].update;
-  })(global, umdName, global.document)`)
-
-  return {
-    bootstrap,
-    mount,
-    unmount,
-    update,
-  }
+  return resolver().bind(global)(global)
 }
