@@ -27,7 +27,7 @@ export function proxy(original: Record<string, any>, onWrite: any) {
         map[key] = proxy(original[key], (obj: object) => (copy[key] = obj))
         return map[key]
       }
-      return copy[key] || Reflect.get(target, key, receiver)
+      return copy[key] || target[key]
     },
     set(target, key: string, value) {
       if (isObj(value)) {
