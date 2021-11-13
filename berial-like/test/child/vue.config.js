@@ -2,7 +2,7 @@ const path = require('path')
 const { name } = require('./package')
 
 module.exports = {
-  publicPath: '/',
+  publicPath: 'http://localhost:3002',
   devServer: {
     headers: { 'Access-Control-Allow-Origin': '*' },
     contentBase: path.join(__dirname, 'dist'),

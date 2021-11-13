@@ -16,7 +16,6 @@ export default function runScript(
   const resolver = new Function(
     'window',
     `
-    window.IS_BERIAL_LIKE_SANDBOX = true
     with(window.IS_BERIAL_LIKE_SANDBOX) {
       try {
         ${script};
