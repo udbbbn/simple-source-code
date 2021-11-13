@@ -23,12 +23,13 @@ export default async function loadScript(
   let update: PromiseFn[] = []
   /* 执行 script 并将生命周期收集 */
   scriptToLoad.forEach((script) => {
-    const lifecycle = runScript(script, global, name)
-
-    bootstrap.push(lifecycle.bootstrap)
-    mount.push(lifecycle.mount)
-    unmount.push(lifecycle.unmount)
-    update.push(lifecycle.update)
+    const lifecycle = runScript(script, global, name) || {}
+    if (lifecycle) {
+      bootstrap.push(lifecycle.bootstrap)
+      mount.push(lifecycle.mount)
+      unmount.push(lifecycle.unmount)
+      update.push(lifecycle.update)
+    }
   })
 
   return {

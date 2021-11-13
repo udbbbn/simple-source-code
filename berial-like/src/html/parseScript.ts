@@ -20,6 +20,7 @@ export default function parseScript(template: string) {
   const scriptURLs: string[] = []
   const scripts: string[] = []
   let match
+  SCRIPT_URL_RE.lastIndex = SCRIPT_CONTENT_RE.lastIndex = 0
 
   while ((match = SCRIPT_URL_RE.exec(template))) {
     /**

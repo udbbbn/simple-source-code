@@ -30,6 +30,7 @@ function parseCSS(template: string) {
   const cssURLs: string[] = []
   const styles: string[] = []
   let match
+  CSS_URL_RE.lastIndex = STYLE_RE.lastIndex = 0
 
   while ((match = CSS_URL_RE.exec(template))) {
     let captured = match[1].trim()
