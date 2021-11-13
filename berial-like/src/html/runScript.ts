@@ -13,20 +13,20 @@ export default function runScript(
   global: ProxyConstructor,
   umdName: string
 ) {
-  const resolver = new Function(`
-    return function(window) {
-      window.IS_BERIAL_LIKE_SANDBOX = true;
-      with(window.IS_BERIAL_LIKE_SANDBOX) {
-        try {
-          ${script}
-          return window['${umdName}']
-        }
-        catch(e) {
-          console.log(e)
-        }
+  const resolver = new Function(
+    'window',
+    `
+    window.IS_BERIAL_LIKE_SANDBOX = true
+    with(window.IS_BERIAL_LIKE_SANDBOX) {
+      try {
+        ${script};
+        return window['${umdName}']
+      }
+      catch(e) {
+        console.log(e)
       }
     }
-  `)
-
-  return resolver().bind(global)(global)
+  `
+  )
+  return resolver.call(global, global)
 }
