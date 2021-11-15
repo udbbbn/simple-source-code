@@ -1,42 +1,21 @@
 {
-  "name": "child",
-  "version": "0.1.0",
-  "private": true,
+  "name": "child-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "udbbbn",
+  "license": "MIT",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib ",
-    "lint": "vue-cli-service lint"
-  },
-  "dependencies": {
-    "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "dev": "npx parcel ./index.html -p 2345 --public-url http://localhost:2345"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "vue-template-compiler": "^2.6.11"
+    "@babel/preset-react": "^7.16.0",
+    "@parcel/transformer-vue": "^2.0.0",
+    "parcel": "2"
   },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {}
+  "dependencies": {
+    "core-js": "3",
+    "vue": "^3.2.21"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  "target": "legacy",
+  "outputFormat": "global"
 }

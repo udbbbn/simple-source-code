@@ -1,6 +1,8 @@
 */node_modules
+*/**/node_modules
 */dist
 */**/dist
 */demo
 */.cache
 */.parcel-cache
+*/**/.parcel-cache

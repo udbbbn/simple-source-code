@@ -13,7 +13,7 @@
     "lint": "eslint **/*.ts",
     "fix": "eslint **/*.ts --fix",
     "type": "tsc --project tsconfig.json --skipLibCheck --noEmit",
-    "serve": "parcel ./test/*.html"
+    "serve": "npx parcel ./test/*.html -p 1235"
   },
   "author": "",
   "license": "ISC",
