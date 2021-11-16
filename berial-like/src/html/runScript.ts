@@ -1,4 +1,4 @@
-import { PromiseFn } from '../types'
+import { Lifecycle, PromiseFn } from '../types'
 
 /**
  * 这里注意 WindowProxy
@@ -12,7 +12,7 @@ export default function runScript(
   //   global: WindowProxy = window,
   global: ProxyConstructor,
   umdName: string
-) {
+): Lifecycle {
   const resolver = new Function(
     'window',
     `

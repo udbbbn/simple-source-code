@@ -16,7 +16,10 @@ export const SCRIPT_ANY_RE = /<\s*script[^>]*>[\s\S]*?(?:<\s*\/script[^>]*>)/g
 /* 匹配是否为绝对路径域名 */
 export const TEST_URL_RE = /(?:https?):\/\/[-a-zA-Z0-9.]+/
 
-export default function parseScript(template: string) {
+export default function parseScript(template: string): {
+  scriptURLs: string[]
+  scripts: string[]
+} {
   const scriptURLs: string[] = []
   const scripts: string[] = []
   let match

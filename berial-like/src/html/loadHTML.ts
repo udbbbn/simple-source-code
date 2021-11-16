@@ -18,7 +18,7 @@ const BODY_CONTENT_RE = /<\s*body[^>]*>([\w\W]*)<\s*\/body>/
  *    <\!-- Script replaced by Berial-Like. Original script: ../dist/umd/index.js -->\n
  *    <\!-- Script replaced by Berial-Like. Original script: inline script -->\n</html>'
  */
-function scriptReplacer(substring: string) {
+function scriptReplacer(substring: string): string {
   const matchedURL = SCRIPT_URL_RE.exec(substring)
   if (matchedURL) {
     return `<!-- ${REPLACED_BY_BERIAL_LIKE} Original script: ${matchedURL[1]} -->`
@@ -26,10 +26,10 @@ function scriptReplacer(substring: string) {
   return `<!-- ${REPLACED_BY_BERIAL_LIKE} Original script: inline script -->`
 }
 
-export default function loadBody(template: string) {
+export default function loadBody(template: string): HTMLTemplateElement {
   let bodyContent = template.match(BODY_CONTENT_RE)?.[1] ?? ''
   bodyContent = bodyContent.replace(SCRIPT_ANY_RE, scriptReplacer)
-  const div = document.createElement('template')
-  div.innerHTML = bodyContent
-  return div
+  const body = document.createElement('template')
+  body.innerHTML = bodyContent
+  return body
 }

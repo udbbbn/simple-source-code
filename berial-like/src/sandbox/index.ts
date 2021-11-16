@@ -9,7 +9,10 @@ const isArr = (x: unknown): x is any[] => Array.isArray(x)
 const isObj = (x: unknown): x is object =>
   Object.prototype.toString.call(x) === '[object Object]'
 
-export function proxy(original: Record<string, any>, onWrite: any) {
+export function proxy(
+  original: Record<string, any>,
+  onWrite: any
+): Record<string, any> {
   const copy = isArr(original) ? [] : getCleanCopy(original)
   const map = Object.create(null)
   const draft = {
@@ -19,19 +22,28 @@ export function proxy(original: Record<string, any>, onWrite: any) {
   }
 
   return new Proxy(original, {
-    get(target, key: string, receiver) {
+    get<T extends string, U extends Record<string, any>>(
+      target: U,
+      key: T
+    ): U[T] | boolean {
       if (key === IS_SANDBOX) return true
       if (key in map) return map[key]
 
       if (isObj(original[key]) && original[key] !== null) {
-        map[key] = proxy(original[key], (obj: object) => (copy[key] = obj))
+        map[key] = proxy(
+          original[key],
+          (obj: Record<string, unknown>) => (copy[key] = obj)
+        )
         return map[key]
       }
       return copy[key] || target[key]
     },
-    set(target, key: string, value) {
+    set(target, key: string, value): boolean {
       if (isObj(value)) {
-        map[key] = proxy(value, (obj: object) => (copy[key] = obj))
+        map[key] = proxy(
+          value,
+          (obj: Record<string, unknown>) => (copy[key] = obj)
+        )
       }
       onWrite && onWrite(draft.onWrite)
       copy[key] = value
@@ -41,6 +53,6 @@ export function proxy(original: Record<string, any>, onWrite: any) {
 }
 
 /* 基于 obj 的 prototype 去创建一个对象 */
-function getCleanCopy(obj: object) {
+function getCleanCopy(obj: Record<string, unknown>) {
   return Object.create(Object.getPrototypeOf(obj))
 }

@@ -12,13 +12,15 @@ const CSS_URL_RE = new RegExp(
 /* 匹配 Style 标签 */
 const STYLE_RE = /<\s*style\s*>([^<]*)<\s*\/style>/g
 
-export default async function loadCSS(template: string) {
+export default async function loadCSS(
+  template: string
+): Promise<HTMLStyleElement[]> {
   const { cssURLs, styles } = parseCSS(template)
   const fetchStyles = await Promise.all(cssURLs.map((url) => request(url)))
   return toStyleNode(fetchStyles.concat(styles))
 }
 
-function toStyleNode(styles: string[]) {
+function toStyleNode(styles: string[]): HTMLStyleElement[] {
   return styles.map((style) => {
     const styleNode = document.createElement('style')
     styleNode.appendChild(document.createTextNode(style))
@@ -26,7 +28,10 @@ function toStyleNode(styles: string[]) {
   })
 }
 
-function parseCSS(template: string) {
+function parseCSS(template: string): {
+  cssURLs: string[]
+  styles: string[]
+} {
   const cssURLs: string[] = []
   const styles: string[] = []
   let match

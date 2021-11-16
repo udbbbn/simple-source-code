@@ -24,7 +24,7 @@ export function register(
   name: App['name'],
   entry: App['entry'],
   match: App['match']
-) {
+): void {
   apps.add({
     name,
     entry,
@@ -33,13 +33,13 @@ export function register(
   } as App)
 }
 
-export function start(store: any) {
+export function start(store: any = {}): void {
   started = true
-  reroute(store || {})
+  reroute(store)
 }
 
 /* 加载所有应用并跑钩子 */
-function reroute(store: any) {
+function reroute(store: any): Promise<void> {
   const { loads, mounts, unmounts } = getAppChanges()
   if (started) {
     return perform()
@@ -68,7 +68,7 @@ function getAppChanges() {
   const loads: App[] = []
   const mounts: App[] = []
   const unmounts: App[] = []
-  apps.forEach((app: any) => {
+  apps.forEach((app: App) => {
     const isActive = app.match(window.location)
     /**
      * MOUNTING 跟 UNMOUNTING 没有包含在这个 switch 分支内的原因
@@ -107,7 +107,7 @@ function getAppChanges() {
  * async 的函数会返回 promise
  * 函数内返回 app.loaded 也是返回了一个 promise 并在该 promise 内返回了 app
  */
-async function runLoad(app: App, store: any) {
+async function runLoad(app: App, store: any): Promise<any> {
   if (app.loaded) {
     return app.loaded
   }
@@ -156,7 +156,7 @@ async function runLoad(app: App, store: any) {
 }
 
 /* 调用 bootstrap 钩子 */
-async function runBootstrap(app: App) {
+async function runBootstrap(app: App): Promise<App> {
   if (app.status !== Status.NOT_BOOTSTRAPPED) {
     return app
   }
@@ -167,7 +167,7 @@ async function runBootstrap(app: App) {
 }
 
 /* 挂载 */
-async function runMount(app: App) {
+async function runMount(app: App): Promise<App> {
   if (app.status !== Status.NOT_MOUNTED) {
     return app
   }
@@ -178,7 +178,7 @@ async function runMount(app: App) {
 }
 
 /* 卸载 */
-async function runUnmount(app: App) {
+async function runUnmount(app: App): Promise<App> {
   if (app.status !== Status.MOUNTED) {
     return app
   }
@@ -189,7 +189,7 @@ async function runUnmount(app: App) {
 }
 
 /* 创建原生自定义组件 */
-async function loadShadowDOM(app: App, store: any) {
+async function loadShadowDOM(app: App, store: any): Promise<HTMLElement> {
   return new Promise<HTMLElement>((resolve, reject) => {
     try {
       class Berial extends HTMLElement {
@@ -197,12 +197,12 @@ async function loadShadowDOM(app: App, store: any) {
           return app.name
         }
         connectedCallback() {
-          this.attachShadow({ mode: 'open' })
           resolve(this)
         }
         store: any
         constructor() {
           super()
+          this.attachShadow({ mode: 'open' })
           this.store = loadStore(app, store)
         }
       }
@@ -233,7 +233,9 @@ function loadStore(app: any, store: any) {
   })
 }
 
-function compose(fns: ((props: App) => Promise<any>)[]) {
+function compose(
+  fns: ((props: App) => Promise<any>)[]
+): (app: App) => Promise<void> {
   fns = Array.isArray(fns) ? fns : [fns]
   return (props: App) =>
     fns.reduce((p, fn) => p.then(() => fn(props)), Promise.resolve())
@@ -246,7 +248,7 @@ function compose(fns: ((props: App) => Promise<any>)[]) {
  *
  * 此处理解不一定正确
  */
-function urlReroute() {
+function urlReroute(): void {
   reroute({})
 }
 
@@ -261,7 +263,7 @@ const capturedEventListeners = {
 
 const originalAddEventListener = window.addEventListener
 const originalRemoveEventListener = window.removeEventListener
-window.addEventListener = function (name: string, fn: any, ...args: any) {
+window.addEventListener = function (name: string, fn: any, ...args: any): void {
   if (
     routingEventsListeningTo.indexOf(name) >= 0 &&
     !capturedEventListeners[name].some((f: any) => f == fn)
@@ -271,7 +273,11 @@ window.addEventListener = function (name: string, fn: any, ...args: any) {
   }
   return originalAddEventListener.apply(this, args)
 }
-window.removeEventListener = function (name: string, fn: any, ...args: any) {
+window.removeEventListener = function (
+  name: string,
+  fn: any,
+  ...args: any
+): void {
   if (routingEventsListeningTo.indexOf(name) >= 0) {
     capturedEventListeners[name] = capturedEventListeners[name].filter(
       (f: any) => f !== fn
@@ -281,8 +287,8 @@ window.removeEventListener = function (name: string, fn: any, ...args: any) {
   return originalRemoveEventListener.apply(this, args)
 }
 /* 该方法为了确保同 url 不会重复跑钩子函数 */
-function patchedUpdateState(updateState: any) {
-  return function (...args: any) {
+function patchedUpdateState(updateState: any): (...arg: any) => void {
+  return function (...args) {
     const urlBefore = window.location.href
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

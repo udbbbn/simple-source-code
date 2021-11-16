@@ -1,4 +1,4 @@
-import type { App } from 'src/types'
+import type { App, Lifecycles } from 'src/types'
 import loadScript from './loadScript'
 import parseScript from './parseScript'
 import runScript from './runScript'
@@ -7,7 +7,11 @@ import { request } from 'src/utils'
 import loadBody from './loadHTML'
 import loadCSS from './loadCSS'
 
-export async function importHTML(app: App) {
+export async function importHTML(app: App): Promise<{
+  lifecycle: Lifecycles
+  styleNodes: HTMLStyleElement[]
+  bodyNode: HTMLTemplateElement
+}> {
   const template = await request(app.entry as string)
   const styleNodes = await loadCSS(template)
   const bodyNode = loadBody(template)
