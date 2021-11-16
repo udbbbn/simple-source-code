@@ -7,10 +7,10 @@
   </head>
 
   <body>
-    <a href="#/app1">应用1</a>
-    <a href="#/app2">应用2</a>
-    <a href="#/app3">typeof entry === string</a>
-    <a href="#/vue">vue app</a>
+    <a href="/app1">应用1</a>
+    <a href="/app2">应用2</a>
+    <a href="/app3">typeof entry === string</a>
+    <a href="/vue">vue app</a>
     <one-app></one-app>
     <two-app></two-app>
     <three-app></three-app>
@@ -34,7 +34,7 @@
             },
           }
         },
-        (location) => location.hash === '#/app1'
+        (location) => location.pathname === '/app1'
       )
       berial.register(
         'two-app',
@@ -52,17 +52,17 @@
             },
           }
         },
-        (location) => location.hash === '#/app2'
+        (location) => location.pathname === '/app2'
       )
       berial.register(
         'three-app',
         'http://localhost:1235/umd.html',
-        (location) => location.hash === '#/app3'
+        (location) => location.pathname === '/app3'
       )
       berial.register(
         'child-app',
         'http://localhost:2345',
-        (location) => location.hash === '#/vue'
+        (location) => location.pathname === '/vue'
       )
       berial.start()
     </script>
