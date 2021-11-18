@@ -11,12 +11,17 @@
     <a href="/app2">应用2</a>
     <a href="/app3">typeof entry === string</a>
     <a href="/vue">vue app</a>
+    <button onclick="changeRoute('/vue')">vue app</button>
     <one-app></one-app>
     <two-app></two-app>
     <three-app></three-app>
     <child-app></child-app>
     <script src="../dist/umd/index.js"></script>
     <script>
+      const changeRoute = (pathname) => {
+        history.pushState({}, '', pathname)
+      }
+
       berial.register(
         'one-app',
         async (app) => {

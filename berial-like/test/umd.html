@@ -31,7 +31,11 @@
           mount: async (props) => {
             console.log('mount3')
           },
-          unmount: async (props) => {
+          unmount: async ({ host }) => {
+            const root = host.shadowRoot
+            root
+              .querySelectorAll('div')
+              .forEach((item) => item.parentNode.removeChild(item))
             console.log('unmount3')
           },
         }
