@@ -15,7 +15,7 @@ export async function importHTML(app: App): Promise<{
   const template = await request(app.entry as string)
   const styleNodes = await loadCSS(template)
   const bodyNode = loadBody(template)
-  const fake = await proxy(window as any, null)
+  const fake = proxy(window as any, null)
   const lifecycle = await loadScript(template, fake as any, app.name)
   return { lifecycle, styleNodes, bodyNode }
 }

@@ -29,7 +29,7 @@ export function proxy(
       if (key === IS_SANDBOX) return true
       if (key in map) return map[key]
 
-      if (isObj(original[key]) && original[key] !== null) {
+      if (isObj(original[key]) || isArr(original[key])) {
         map[key] = proxy(
           original[key],
           (obj: Record<string, unknown>) => (copy[key] = obj)
@@ -39,7 +39,7 @@ export function proxy(
       return copy[key] || target[key]
     },
     set(target, key: string, value): boolean {
-      if (isObj(value)) {
+      if (isObj(original[key]) || isArr(original[key])) {
         map[key] = proxy(
           value,
           (obj: Record<string, unknown>) => (copy[key] = obj)

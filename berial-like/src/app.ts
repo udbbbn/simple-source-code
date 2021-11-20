@@ -1,6 +1,7 @@
 import type { App, Lifecycle, Lifecycles } from './types'
 import { importHTML } from './html'
-import { appendChildren, lifecycleCheck } from './utils'
+
+import { lifecycleCheck } from './utils'
 
 /* 生命周期 */
 export enum Status {
@@ -114,10 +115,10 @@ async function runLoad(app: App, store: any): Promise<any> {
   app.loaded = Promise.resolve().then(async () => {
     app.status = Status.LOADING
     let lifecycle: Lifecycles
-    let host = await loadShadowDOM(app, store)
-    app.host = host as Element
     let bodyNode: HTMLTemplateElement
     let styleNodes: HTMLStyleElement[] = []
+    let host = await loadShadowDOM(app, store)
+    app.host = host as Element
     if (typeof app.entry === 'string') {
       const exports = await importHTML(app)
       lifecycleCheck(exports.lifecycle)
@@ -271,8 +272,9 @@ window.addEventListener = function (name: string, fn: any, ...args: any): void {
     capturedEventListeners[name].push(fn)
     return
   }
-  return originalAddEventListener.apply(this, args)
+  return originalAddEventListener.apply(this, [name, fn, ...args] as any)
 }
+
 window.removeEventListener = function (
   name: string,
   fn: any,
@@ -284,9 +286,9 @@ window.removeEventListener = function (
     )
     return
   }
-  return originalRemoveEventListener.apply(this, args)
+  return originalRemoveEventListener.apply(this, [name, fn, ...args] as any)
 }
-/* 该方法为了确保同 url 不会重复跑钩子函数 */
+// /* 该方法为了确保同 url 不会重复跑钩子函数 */
 function patchedUpdateState(updateState: any): (...arg: any) => void {
   return function (...args) {
     const urlBefore = window.location.href
