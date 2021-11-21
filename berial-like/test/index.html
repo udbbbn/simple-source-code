@@ -12,12 +12,19 @@
     <a href="/app3">typeof entry === string</a>
     <a href="/vue">vue app</a>
     <button onclick="changeRoute('/vue')">vue app</button>
+    <button onclick="changeRoute('/react')">react app</button>
+    <button onclick="changeRoute('/child-react')">child-react app</button>
     <one-app></one-app>
     <two-app></two-app>
     <three-app></three-app>
     <child-app></child-app>
+    <react-child></react-child>
+    <child-react></child-react>
     <script src="../dist/umd/index.js"></script>
     <script>
+      window.$RefreshReg$ = () => {}
+      window.$RefreshSig$ = () => () => {}
+
       const changeRoute = (pathname) => {
         history.pushState({}, '', pathname)
       }
@@ -68,6 +75,23 @@
         'child-app',
         'http://localhost:2345',
         (location) => location.pathname === '/vue'
+      )
+      /**
+       * react-child 是使用 create-react-app 创建的
+       * 跑不动
+       * 测试 af95c6b7051c3fd34845cccd70fd2dfa089be28b commit 的 berial 代码也跑不动
+       * 但是使用 qiankun 是可以正常跑的
+       * 暂时定位不到原因
+       */
+      berial.register(
+        'react-child',
+        'http://localhost:3333',
+        (location) => location.pathname === '/react'
+      )
+      berial.register(
+        'child-react',
+        'http://localhost:3002',
+        (location) => location.pathname === '/child-react'
       )
       berial.start()
     </script>
