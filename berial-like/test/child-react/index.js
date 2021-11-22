@@ -17,7 +17,7 @@ export async function mount({ host }) {
 }
 
 export async function unmount({ host }) {
-  console.log('react unmout')
+  console.log('react unmount')
 
   const root = host.shadowRoot.getElementById('root')
   // 从 DOM 中卸载组件

@@ -1,9 +1,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
+let mountEl = null
+
 function render(container = '#app') {
   const app = createApp(App)
   app.mount(container)
+  return app
 }
 
 if (!(window as any).IS_BERIAL_LIKE_SANDBOX) {
@@ -21,9 +24,12 @@ window['child-app'] = class {
   static async mount({ host }) {
     console.log('mount')
     console.log(host.shadowRoot)
-    render(host.shadowRoot.querySelector('#app'))
+    mountEl = render(host.shadowRoot.querySelector('#app'))
+    console.log('mountEl', mountEl.unmount)
   }
-  static async umount() {
-    console.log('umount')
+  static async unmount() {
+    console.log('unmount')
+    mountEl.unmount()
+    mountEl = null
   }
 }
