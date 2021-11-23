@@ -1,7 +1,8 @@
 import type { App, Lifecycle, Lifecycles } from './types'
 import { importHTML } from './html'
-
 import { lifecycleCheck } from './utils'
+import { bridgeEvent } from './compat/bridge-event'
+export const options = {} as any
 
 /* 生命周期 */
 export enum Status {
@@ -144,7 +145,8 @@ async function runLoad(app: App, store: any): Promise<any> {
       lifecycle.unmount = [unmount]
       lifecycle.update = [update]
     }
-    // appendChildren(host.shadowRoot!, [...styleNodes!, bodyNode!])
+    // options.bridgeEvent && options.bridgeEvent(host.shadowRoot)
+    bridgeEvent(host.shadowRoot!)
     app.status = Status.NOT_BOOTSTRAPPED
     app.bootstrap = compose(lifecycle!.bootstrap)
     app.mount = compose(lifecycle!.mount)

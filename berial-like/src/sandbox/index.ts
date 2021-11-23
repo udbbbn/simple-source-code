@@ -53,6 +53,6 @@ export function proxy(
 }
 
 /* 基于 obj 的 prototype 去创建一个对象 */
-function getCleanCopy(obj: Record<string, unknown>) {
+function getCleanCopy(obj: Record<string, unknown>): Record<PropertyKey, any> {
   return Object.create(Object.getPrototypeOf(obj))
 }
