@@ -1,8 +1,6 @@
-import type { App, Lifecycle, Lifecycles } from './types'
+import type { App, Lifecycle, Lifecycles, PromiseFn } from './types'
 import { importHTML } from './html'
 import { lifecycleCheck } from './utils'
-import { bridgeEvent } from './compat/bridge-event'
-export const options = {} as any
 
 /* 生命周期 */
 export enum Status {
@@ -20,6 +18,8 @@ export enum Status {
 
 let started = false
 const apps: any = new Set()
+const mixins: any = new Set()
+const plugins: any = new Set()
 
 export function register(
   name: App['name'],
@@ -37,6 +37,19 @@ export function register(
 export function start(): void {
   started = true
   reroute()
+}
+
+export function use(plugin: () => any): void {
+  if (!plugins.has(plugin)) {
+    plugins.add(plugin)
+    plugin()
+  }
+}
+
+export function mixin(mix: any): void {
+  if (!mixins.has(mix)) {
+    mixins.add(mix)
+  }
 }
 
 /* 加载所有应用并跑钩子 */
@@ -117,6 +130,7 @@ async function runLoad(app: App): Promise<any> {
     let lifecycle: Lifecycles
     let bodyNode: HTMLTemplateElement
     let styleNodes: HTMLStyleElement[] = []
+    const map = mapMixin()
     let host = await loadShadowDOM(app)
     app.host = host as Element
     if (typeof app.entry === 'string') {
@@ -143,16 +157,33 @@ async function runLoad(app: App): Promise<any> {
       lifecycle.mount = [mount]
       lifecycle.unmount = [unmount]
     }
-    // options.bridgeEvent && options.bridgeEvent(host.shadowRoot)
-    bridgeEvent(host.shadowRoot!)
+    map.load.length && (await compose(map.load)(app))
     app.status = Status.NOT_BOOTSTRAPPED
-    app.bootstrap = compose(lifecycle!.bootstrap)
-    app.mount = compose(lifecycle!.mount)
-    app.unmount = compose(lifecycle!.unmount)
+    app.bootstrap = compose(map.bootstrap.concat(lifecycle!.bootstrap))
+    app.mount = compose(map.mount.concat(lifecycle!.mount))
+    app.unmount = compose(map.unmount.concat(lifecycle!.unmount))
     delete app.loaded
     return app
   })
   return app.loaded
+}
+
+function mapMixin() {
+  const out: Lifecycles = {
+    load: [],
+    bootstrap: [],
+    mount: [],
+    unmount: [],
+  }
+
+  mixins.forEach((item: Lifecycle) => {
+    item.load && out.load.push(item.load)
+    item.bootstrap && out.bootstrap.push(item.bootstrap)
+    item.mount && out.mount.push(item.mount)
+    item.unmount && out.unmount.push(item.unmount)
+  })
+
+  return out
 }
 
 /* 调用 bootstrap 钩子 */
@@ -238,14 +269,14 @@ const captured = {
   popstate: [],
 } as any
 
-const originalAddEventListener = window.addEventListener
-const originalRemoveEventListener = window.removeEventListener
+const oldAEL = window.addEventListener
+const oldREL = window.removeEventListener
 window.addEventListener = function (name: string, fn: any, ...args: any): void {
   if (events.indexOf(name) >= 0 && !captured[name].some((f: any) => f == fn)) {
     captured[name].push(fn)
     return
   }
-  return originalAddEventListener.apply(this, [name, fn, ...args] as any)
+  return oldAEL.apply(this, [name, fn, ...args] as any)
 }
 
 window.removeEventListener = function (
@@ -257,7 +288,7 @@ window.removeEventListener = function (
     captured[name] = captured[name].filter((f: any) => f !== fn)
     return
   }
-  return originalRemoveEventListener.apply(this, [name, fn, ...args] as any)
+  return oldREL.apply(this, [name, fn, ...args] as any)
 }
 // /* 该方法为了确保同 url 不会重复跑钩子函数 */
 function patchedUpdateState(updateState: any): (...arg: any) => void {

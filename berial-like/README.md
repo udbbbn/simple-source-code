@@ -14,7 +14,7 @@
 
 - html loader
 
-- global store
+- mixins
 
 ### Use
 

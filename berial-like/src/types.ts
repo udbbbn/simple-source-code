@@ -13,6 +13,7 @@ export type App = {
 
 export type Lifecycle = {
   /* 生命周期 */
+  load: PromiseFn
   bootstrap: PromiseFn
   mount: PromiseFn
   unmount: PromiseFn
