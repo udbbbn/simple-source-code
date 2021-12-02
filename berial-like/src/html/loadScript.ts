@@ -20,16 +20,13 @@ export default async function loadScript(
   let bootstrap: PromiseFn[] = []
   let mount: PromiseFn[] = []
   let unmount: PromiseFn[] = []
-  let update: PromiseFn[] = []
   /* 执行 script 并将生命周期收集 */
   scriptToLoad.forEach((script) => {
     const lifecycle = runScript(script, global, name)
-    console.log(name, lifecycle)
     if (lifecycle) {
       bootstrap.push(lifecycle.bootstrap)
       mount.push(lifecycle.mount)
       unmount.push(lifecycle.unmount)
-      update.push(lifecycle.update)
     }
   })
 
@@ -37,6 +34,5 @@ export default async function loadScript(
     bootstrap,
     mount,
     unmount,
-    update,
   }
 }

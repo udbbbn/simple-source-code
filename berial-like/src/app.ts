@@ -20,7 +20,6 @@ export enum Status {
 
 let started = false
 const apps: any = new Set()
-const deps: any = new Set()
 
 export function register(
   name: App['name'],
@@ -35,13 +34,13 @@ export function register(
   } as App)
 }
 
-export function start(store: any = {}): void {
+export function start(): void {
   started = true
-  reroute(store)
+  reroute()
 }
 
 /* 加载所有应用并跑钩子 */
-function reroute(store: any): Promise<void> {
+function reroute(): Promise<void> {
   const { loads, mounts, unmounts } = getAppChanges()
   if (started) {
     return perform()
@@ -54,7 +53,7 @@ function reroute(store: any): Promise<void> {
   async function perform() {
     unmounts.map(runUnmount)
     loads.map(async (app) => {
-      app = await runLoad(app, store)
+      app = await runLoad(app)
       app = await runBootstrap(app)
       return runMount(app)
     })
@@ -109,7 +108,7 @@ function getAppChanges() {
  * async 的函数会返回 promise
  * 函数内返回 app.loaded 也是返回了一个 promise 并在该 promise 内返回了 app
  */
-async function runLoad(app: App, store: any): Promise<any> {
+async function runLoad(app: App): Promise<any> {
   if (app.loaded) {
     return app.loaded
   }
@@ -118,7 +117,7 @@ async function runLoad(app: App, store: any): Promise<any> {
     let lifecycle: Lifecycles
     let bodyNode: HTMLTemplateElement
     let styleNodes: HTMLStyleElement[] = []
-    let host = await loadShadowDOM(app, store)
+    let host = await loadShadowDOM(app)
     app.host = host as Element
     if (typeof app.entry === 'string') {
       const exports = await importHTML(app)
@@ -133,7 +132,7 @@ async function runLoad(app: App, store: any): Promise<any> {
       }
     } else {
       const exportLifecycles = (await app.entry(app)) as Lifecycle
-      const { bootstrap, mount, unmount, update } = exportLifecycles
+      const { bootstrap, mount, unmount } = exportLifecycles
       /**
        * 这里其实可以直接让 lifecycle = exportLifecycles
        * 等 compose 方法将钩子转为数组
@@ -143,7 +142,6 @@ async function runLoad(app: App, store: any): Promise<any> {
       lifecycle.bootstrap = [bootstrap]
       lifecycle.mount = [mount]
       lifecycle.unmount = [unmount]
-      lifecycle.update = [update]
     }
     // options.bridgeEvent && options.bridgeEvent(host.shadowRoot)
     bridgeEvent(host.shadowRoot!)
@@ -151,7 +149,6 @@ async function runLoad(app: App, store: any): Promise<any> {
     app.bootstrap = compose(lifecycle!.bootstrap)
     app.mount = compose(lifecycle!.mount)
     app.unmount = compose(lifecycle!.unmount)
-    app.update = compose(lifecycle!.update)
     delete app.loaded
     return app
   })
@@ -192,7 +189,7 @@ async function runUnmount(app: App): Promise<App> {
 }
 
 /* 创建原生自定义组件 */
-async function loadShadowDOM(app: App, store: any): Promise<HTMLElement> {
+async function loadShadowDOM(app: App): Promise<HTMLElement> {
   return new Promise<HTMLElement>((resolve, reject) => {
     try {
       class Berial extends HTMLElement {
@@ -202,11 +199,9 @@ async function loadShadowDOM(app: App, store: any): Promise<HTMLElement> {
         connectedCallback() {
           resolve(this)
         }
-        store: any
         constructor() {
           super()
           this.attachShadow({ mode: 'open' })
-          this.store = loadStore(app, store)
         }
       }
       const hasDef = window.customElements.get(app.name)
@@ -216,23 +211,6 @@ async function loadShadowDOM(app: App, store: any): Promise<HTMLElement> {
     } catch (e) {
       reject(e)
     }
-  })
-}
-
-function loadStore(app: any, store: any) {
-  return new Proxy(store, {
-    get(target, key) {
-      const has = app.deps.has(app)
-      if (!has) {
-        deps.add(app)
-      }
-      return target[key]
-    },
-    set(target, key, value) {
-      target[key] = value
-      deps.forEach((app: App) => app.update(app))
-      return true
-    },
   })
 }
 
@@ -251,15 +229,11 @@ function compose(
  *
  * 此处理解不一定正确
  */
-function urlReroute(): void {
-  reroute({})
-}
+window.addEventListener('hashchange', reroute)
+window.addEventListener('popstate', reroute)
 
-window.addEventListener('hashchange', urlReroute)
-window.addEventListener('popstate', urlReroute)
-
-const routingEventsListeningTo = ['hashchange', 'popstate']
-const capturedEventListeners = {
+const events = ['hashchange', 'popstate']
+const captured = {
   hashchange: [],
   popstate: [],
 } as any
@@ -267,11 +241,8 @@ const capturedEventListeners = {
 const originalAddEventListener = window.addEventListener
 const originalRemoveEventListener = window.removeEventListener
 window.addEventListener = function (name: string, fn: any, ...args: any): void {
-  if (
-    routingEventsListeningTo.indexOf(name) >= 0 &&
-    !capturedEventListeners[name].some((f: any) => f == fn)
-  ) {
-    capturedEventListeners[name].push(fn)
+  if (events.indexOf(name) >= 0 && !captured[name].some((f: any) => f == fn)) {
+    captured[name].push(fn)
     return
   }
   return originalAddEventListener.apply(this, [name, fn, ...args] as any)
@@ -282,10 +253,8 @@ window.removeEventListener = function (
   fn: any,
   ...args: any
 ): void {
-  if (routingEventsListeningTo.indexOf(name) >= 0) {
-    capturedEventListeners[name] = capturedEventListeners[name].filter(
-      (f: any) => f !== fn
-    )
+  if (events.indexOf(name) >= 0) {
+    captured[name] = captured[name].filter((f: any) => f !== fn)
     return
   }
   return originalRemoveEventListener.apply(this, [name, fn, ...args] as any)

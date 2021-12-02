@@ -16,7 +16,6 @@ export type Lifecycle = {
   bootstrap: PromiseFn
   mount: PromiseFn
   unmount: PromiseFn
-  update: PromiseFn
 }
 
 export type Lifecycles = ToArray<Lifecycle>
