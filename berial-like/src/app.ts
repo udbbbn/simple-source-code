@@ -269,24 +269,19 @@ function polyfillRouter() {
     return oldREL.apply(this, [name, fn, ...args] as any)
   }
   // /* 该方法为了确保同 url 不会重复跑钩子函数 */
-  function polyfillRoute(updateState: any): (...arg: any) => void {
-    return function (...args) {
-      const urlBefore = window.location.href
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      updateState.apply(this, args)
-
-      const urlAfter = window.location.href
-
-      if (urlBefore !== urlAfter) {
+  function polyfillHistory(fn: any): (...arg: any) => void {
+    return function (this: Window['history'], ...args) {
+      const before = window.location.href
+      fn.apply(this, args)
+      const after = window.location.href
+      if (before !== after) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
+        // @ts-ignore
         reroute(new PopStateEvent('popstate'))
       }
     }
   }
 
-  window.history.pushState = polyfillRoute(window.history.pushState)
-  window.history.replaceState = polyfillRoute(window.history.replaceState)
+  window.history.pushState = polyfillHistory(window.history.pushState)
+  window.history.replaceState = polyfillHistory(window.history.replaceState)
 }
