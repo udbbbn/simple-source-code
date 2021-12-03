@@ -4,8 +4,8 @@
   "description": "berial demo with react",
   "main": "index.js",
   "scripts": {
-    "build": "cross-env NODE_ENV=production webpack --mode production",
-    "start": "cross-env NODE_ENV=development webpack-dev-server --mode production"
+    "build": "NODE_ENV=production webpack --mode production",
+    "start": "NODE_ENV=development webpack-dev-server --mode production"
   },
   "keywords": [
     "berial",
@@ -23,7 +23,6 @@
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-react": "^7.10.4",
     "babel-loader": "^8.0.6",
-    "cross-env": "^6.0.3",
     "css-loader": "^3.2.0",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.8.0",

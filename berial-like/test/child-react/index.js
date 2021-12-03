@@ -1,12 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App.jsx'
+import { load } from './bridge-event'
 
 if (!window.IS_BERIAL_LIKE_SANDBOX) {
   ReactDOM.render(<App />, document.getElementById('root'))
 }
 
-export async function bootstrap() {
+export async function bootstrap({ host }) {
+  load(host.shadowRoot)
   console.log('react bootstrap')
 }
 

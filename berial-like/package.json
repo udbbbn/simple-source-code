@@ -2,7 +2,7 @@
   "name": "berial-like",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/umd/index.js",
   "types": "dist/types/index.d.ts",
   "directories": {
     "test": "test"
