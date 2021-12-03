@@ -9,10 +9,30 @@
  * https://github.com/Houfeng/shadow-view/blob/master/src/EventBridge.ts
  */
 
-import { options } from 'src/app'
+/**
+ * 该插件使用流程
+ * 1. 发布 npm 包 例如: berial-react-event-plugin
+ * 2. react 子应用导入并在 bootstrap 时调用 load(host.shadowRoot)
+ *
+ * 原意是想使用 mixin 挂载 但是有个问题:
+ * 父应用引入的 berial-like 跟 子应用 berial-like 的 mixin 不会是同一个
+ * 所以无法调用 此处 132 没有给出 demo
+ * 以下为本来思路:
+ * 此处做学习 不发布 使用 npm-link
+ * 1. cd berial-like
+ *    npm link
+ * 2. cd test/child-react
+ *    npm link berial-like
+ * 3. 复制该文件至 react 子应用 并调用 mixin
+ *
+ */
+import { mixin } from '../../dist/es/index.esm.js'
 
-// options.bridgeEvent =
-export function bridgeEvent(shadowRoot: ShadowRoot): void {
+export function bridgeEvent(): void {
+  mixin({ load })
+}
+
+export function load(shadowRoot: ShadowRoot): void {
   const define = Object.defineProperty
   const fromNode = shadowRoot,
     toNode = shadowRoot.host
