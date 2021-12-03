@@ -3,18 +3,16 @@ import { Lifecycles, Lifecycle } from 'src/types'
 const mixins: any = new Set()
 const plugins: any = new Set()
 
-export function use(plugin: () => any): void {
+export function use(plugin: (...arg: any) => any, ...args: any): void {
   if (!plugins.has(plugin)) {
     plugins.add(plugin)
-    plugin()
+    plugin(...args)
   }
 }
 
 export function mixin(mix: any): void {
-  console.log('mixins before', mixins, 'mixin', mix)
   if (!mixins.has(mix)) {
     mixins.add(mix)
-    console.log('mixins after', mixins)
   }
 }
 
@@ -25,8 +23,6 @@ export function mapMixin() {
     mount: [],
     unmount: [],
   }
-
-  console.log('mapMixin mixins', mixins)
 
   mixins.forEach((item: Lifecycle) => {
     item.load && out.load!.push(item.load)
