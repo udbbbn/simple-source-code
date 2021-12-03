@@ -16,7 +16,6 @@ export default function runScript(
   const resolver = new Function(
     'window',
     `
-    with(window.IS_BERIAL_LIKE_SANDBOX) {
       try {
         ${script};
         return window['${umdName}']
@@ -24,7 +23,6 @@ export default function runScript(
       catch(e) {
         console.log(e)
       }
-    }
   `
   )
   return resolver.call(global, global)

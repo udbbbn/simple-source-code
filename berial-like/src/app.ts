@@ -1,6 +1,7 @@
 import type { App, Lifecycle, Lifecycles, PromiseFn } from './types'
 import { importHTML } from './html'
 import { lifecycleCheck } from './utils'
+import { mapMixin } from './mixin'
 
 /* 生命周期 */
 export enum Status {
@@ -18,8 +19,6 @@ export enum Status {
 
 let started = false
 const apps: any = new Set()
-const mixins: any = new Set()
-const plugins: any = new Set()
 
 export function register(
   name: App['name'],
@@ -36,20 +35,8 @@ export function register(
 
 export function start(): void {
   started = true
+  polyfillRouter()
   reroute()
-}
-
-export function use(plugin: () => any): void {
-  if (!plugins.has(plugin)) {
-    plugins.add(plugin)
-    plugin()
-  }
-}
-
-export function mixin(mix: any): void {
-  if (!mixins.has(mix)) {
-    mixins.add(mix)
-  }
 }
 
 /* 加载所有应用并跑钩子 */
@@ -157,8 +144,8 @@ async function runLoad(app: App): Promise<any> {
       lifecycle.mount = [mount]
       lifecycle.unmount = [unmount]
     }
-    map.load.length && (await compose(map.load)(app))
     app.status = Status.NOT_BOOTSTRAPPED
+    map.load!.length && (await compose(map.load as PromiseFn[])(app))
     app.bootstrap = compose(map.bootstrap.concat(lifecycle!.bootstrap))
     app.mount = compose(map.mount.concat(lifecycle!.mount))
     app.unmount = compose(map.unmount.concat(lifecycle!.unmount))
@@ -167,25 +154,6 @@ async function runLoad(app: App): Promise<any> {
   })
   return app.loaded
 }
-
-function mapMixin() {
-  const out: Lifecycles = {
-    load: [],
-    bootstrap: [],
-    mount: [],
-    unmount: [],
-  }
-
-  mixins.forEach((item: Lifecycle) => {
-    item.load && out.load.push(item.load)
-    item.bootstrap && out.bootstrap.push(item.bootstrap)
-    item.mount && out.mount.push(item.mount)
-    item.unmount && out.unmount.push(item.unmount)
-  })
-
-  return out
-}
-
 /* 调用 bootstrap 钩子 */
 async function runBootstrap(app: App): Promise<App> {
   if (app.status !== Status.NOT_BOOTSTRAPPED) {
@@ -260,54 +228,64 @@ function compose(
  *
  * 此处理解不一定正确
  */
-window.addEventListener('hashchange', reroute)
-window.addEventListener('popstate', reroute)
 
-const events = ['hashchange', 'popstate']
-const captured = {
-  hashchange: [],
-  popstate: [],
-} as any
+function polyfillRouter() {
+  window.addEventListener('hashchange', reroute)
+  window.addEventListener('popstate', reroute)
 
-const oldAEL = window.addEventListener
-const oldREL = window.removeEventListener
-window.addEventListener = function (name: string, fn: any, ...args: any): void {
-  if (events.indexOf(name) >= 0 && !captured[name].some((f: any) => f == fn)) {
-    captured[name].push(fn)
-    return
+  const events = ['hashchange', 'popstate']
+  const captured = {
+    hashchange: [],
+    popstate: [],
+  } as any
+
+  const oldAEL = window.addEventListener
+  const oldREL = window.removeEventListener
+  window.addEventListener = function (
+    name: string,
+    fn: any,
+    ...args: any
+  ): void {
+    if (
+      events.indexOf(name) >= 0 &&
+      !captured[name].some((f: any) => f == fn)
+    ) {
+      captured[name].push(fn)
+      return
+    }
+    return oldAEL.apply(this, [name, fn, ...args] as any)
   }
-  return oldAEL.apply(this, [name, fn, ...args] as any)
-}
 
-window.removeEventListener = function (
-  name: string,
-  fn: any,
-  ...args: any
-): void {
-  if (events.indexOf(name) >= 0) {
-    captured[name] = captured[name].filter((f: any) => f !== fn)
-    return
+  window.removeEventListener = function (
+    name: string,
+    fn: any,
+    ...args: any
+  ): void {
+    if (events.indexOf(name) >= 0) {
+      captured[name] = captured[name].filter((f: any) => f !== fn)
+      return
+    }
+    return oldREL.apply(this, [name, fn, ...args] as any)
   }
-  return oldREL.apply(this, [name, fn, ...args] as any)
-}
-// /* 该方法为了确保同 url 不会重复跑钩子函数 */
-function patchedUpdateState(updateState: any): (...arg: any) => void {
-  return function (...args) {
-    const urlBefore = window.location.href
+  // /* 该方法为了确保同 url 不会重复跑钩子函数 */
+  function patchedUpdateState(updateState: any): (...arg: any) => void {
+    return function (...args) {
+      const urlBefore = window.location.href
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    updateState.apply(this, args)
-
-    const urlAfter = window.location.href
-
-    if (urlBefore !== urlAfter) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-ignore
-      urlReroute(new PopStateEvent('popstate'))
+      updateState.apply(this, args)
+
+      const urlAfter = window.location.href
+
+      if (urlBefore !== urlAfter) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        urlReroute(new PopStateEvent('popstate'))
+      }
     }
   }
-}
 
-window.history.pushState = patchedUpdateState(window.history.pushState)
-window.history.replaceState = patchedUpdateState(window.history.replaceState)
+  window.history.pushState = patchedUpdateState(window.history.pushState)
+  window.history.replaceState = patchedUpdateState(window.history.replaceState)
+}
