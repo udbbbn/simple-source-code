@@ -32,19 +32,14 @@ export function request(url: string, options?: RequestInit) {
 }
 
 export function lifecycleCheck(lifecycle: Lifecycle | Lifecycles) {
-  const definedLifecycles = new Map<keyof Lifecycle, boolean>()
-  for (const key in lifecycle) {
-    definedLifecycles.set(key as keyof Lifecycle, true)
-  }
-  if (!definedLifecycles.has('bootstrap')) {
-    error(__DEV__, '看起来你没有导出 [bootstrap] 生命周期，这会导致发生错误')
-  }
-  if (!definedLifecycles.has('mount')) {
-    error(__DEV__, '看起来你没有导出 [mount] 生命周期，这会导致发生错误')
-  }
-  if (!definedLifecycles.has('unmount')) {
-    error(__DEV__, '看起来你没有导出 [unmount] 生命周期，这会导致发生错误')
-  }
+  const keys = ['bootstrap', 'mount', 'unmount']
+  keys.forEach((key) => {
+    if (!(key in lifecycle)) {
+      error(
+        `It looks like that you didn't export the lifecycle hook [${key}], which would cause a mistake.`
+      )
+    }
+  })
 }
 
 export function appendChildren<T extends HTMLElement | ShadowRoot>(

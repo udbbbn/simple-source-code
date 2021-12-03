@@ -42,11 +42,7 @@ export function start(): void {
 /* 加载所有应用并跑钩子 */
 function reroute(): Promise<void> {
   const { loads, mounts, unmounts } = getAppChanges()
-  if (started) {
-    return perform()
-  } else {
-    return init()
-  }
+  return started ? perform() : init()
   async function init() {
     await Promise.all(loads.map(runLoad))
   }
@@ -114,16 +110,16 @@ async function runLoad(app: App): Promise<any> {
   }
   app.loaded = Promise.resolve().then(async () => {
     app.status = Status.LOADING
-    let lifecycle: Lifecycles
+    let selfLife: Lifecycles
     let bodyNode: HTMLTemplateElement
     let styleNodes: HTMLStyleElement[] = []
-    const map = mapMixin()
+    const mixinLife = mapMixin()
     let host = await loadShadowDOM(app)
     app.host = host as Element
     if (typeof app.entry === 'string') {
       const exports = await importHTML(app)
       lifecycleCheck(exports.lifecycle)
-      lifecycle = exports.lifecycle
+      selfLife = exports.lifecycle
       bodyNode = exports.bodyNode
       styleNodes = exports.styleNodes
 
@@ -139,16 +135,17 @@ async function runLoad(app: App): Promise<any> {
        * 等 compose 方法将钩子转为数组
        * 但是从类型上会产生误解 (Lifecycle | Lifecycless)
        */
-      lifecycle = {} as Lifecycles
-      lifecycle.bootstrap = [bootstrap]
-      lifecycle.mount = [mount]
-      lifecycle.unmount = [unmount]
+      selfLife = {} as Lifecycles
+      selfLife.bootstrap = [bootstrap]
+      selfLife.mount = [mount]
+      selfLife.unmount = [unmount]
     }
+    mixinLife.load!.length &&
+      (await compose(mixinLife.load as PromiseFn[])(app))
     app.status = Status.NOT_BOOTSTRAPPED
-    map.load!.length && (await compose(map.load as PromiseFn[])(app))
-    app.bootstrap = compose(map.bootstrap.concat(lifecycle!.bootstrap))
-    app.mount = compose(map.mount.concat(lifecycle!.mount))
-    app.unmount = compose(map.unmount.concat(lifecycle!.unmount))
+    app.bootstrap = compose(mixinLife.bootstrap.concat(selfLife.bootstrap))
+    app.mount = compose(mixinLife.mount.concat(selfLife.mount))
+    app.unmount = compose(mixinLife.unmount.concat(selfLife.unmount))
     delete app.loaded
     return app
   })
@@ -227,6 +224,10 @@ function compose(
  * 意味着 卸载子应用时无法清除子应用相关的回调
  *
  * 此处理解不一定正确
+ *
+ * 理解是正确的 是没清除 但是 window 是个代理对象
+ * 加载新的子应用会使用一个新的 window 代理对象
+ * 旧的将会等待被垃圾回收
  */
 
 function polyfillRouter() {
@@ -268,7 +269,7 @@ function polyfillRouter() {
     return oldREL.apply(this, [name, fn, ...args] as any)
   }
   // /* 该方法为了确保同 url 不会重复跑钩子函数 */
-  function patchedUpdateState(updateState: any): (...arg: any) => void {
+  function polyfillRoute(updateState: any): (...arg: any) => void {
     return function (...args) {
       const urlBefore = window.location.href
 
@@ -281,11 +282,11 @@ function polyfillRouter() {
       if (urlBefore !== urlAfter) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-ignore
-        urlReroute(new PopStateEvent('popstate'))
+        reroute(new PopStateEvent('popstate'))
       }
     }
   }
 
-  window.history.pushState = patchedUpdateState(window.history.pushState)
-  window.history.replaceState = patchedUpdateState(window.history.replaceState)
+  window.history.pushState = polyfillRoute(window.history.pushState)
+  window.history.replaceState = polyfillRoute(window.history.replaceState)
 }

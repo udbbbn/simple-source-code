@@ -75,3 +75,17 @@ register(
 )
 start()
 ```
+
+### mixins
+
+```js
+import { mixin } from 'berial'
+
+mixin({
+  bootstrap: () => {},
+  mount: () => {},
+  unmount: () => {}
+})
+```
+
+mixins will apply all apps
