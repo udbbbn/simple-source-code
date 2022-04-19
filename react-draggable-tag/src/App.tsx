@@ -1,4 +1,3 @@
-import "./App.css";
 import Draggable from "./draggable";
 
 const initialTags = [
