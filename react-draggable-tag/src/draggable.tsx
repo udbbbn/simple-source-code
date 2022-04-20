@@ -1,6 +1,6 @@
 import { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
-import "./index.less";
+import "./index.scss";
 
 type Id = number | string;
 type Tag = {

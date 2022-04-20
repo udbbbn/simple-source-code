@@ -17,7 +17,18 @@ function App() {
     <div className="App">
       <Draggable
         tags={initialTags}
-        render={({ tag, index }) => <div className="tag">{tag.content}</div>}
+        render={({ tag, index }) => (
+          <div
+            style={{
+              border: "1px solid #eee",
+              marginTop: 10,
+              marginRight: 10,
+              color: "#000",
+            }}
+          >
+            {tag.content}
+          </div>
+        )}
         onChange={(tags) => console.log(tags)}
       ></Draggable>
     </div>
