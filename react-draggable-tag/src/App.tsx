@@ -14,7 +14,12 @@ const initialTags = [
 
 function App() {
   return (
-    <div className="App">
+    <div
+      className="App"
+      style={{
+        border: "1px solid #eee",
+      }}
+    >
       <Draggable
         tags={initialTags}
         render={({ tag, index }) => (
