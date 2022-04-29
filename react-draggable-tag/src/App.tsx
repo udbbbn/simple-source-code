@@ -1,4 +1,4 @@
-import Draggable from "./draggable";
+import Draggable from "./draggable"
 
 const initialTags = [
   { id: 1, content: "apple" },
@@ -10,7 +10,7 @@ const initialTags = [
   { id: 7, content: "strawberry" },
   { id: 8, content: "cherry" },
   { id: 9, content: "peach" },
-];
+]
 
 function App() {
   return (
@@ -25,6 +25,7 @@ function App() {
         render={({ tag, index }) => (
           <div
             style={{
+              backgroundColor: "#fff",
               border: "1px solid #eee",
               marginTop: 10,
               marginRight: 10,
@@ -34,10 +35,10 @@ function App() {
             {tag.content}
           </div>
         )}
-        onChange={(tags) => console.log(tags)}
+        onChange={tags => console.log(tags)}
       ></Draggable>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
